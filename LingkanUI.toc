@@ -41,6 +41,8 @@ libs\AceConfig-3.0\AceConfig-3.0.xml
 
 ## Core ##
 LingkanUI.lua
+##
+Core\Media\Load_Media.xml
 
 ## Addon Customizing ##
 Customizing\Bartender4.lua
