@@ -45,4 +45,6 @@ LingkanUI.lua
 Core\Media\Load_Media.xml
 
 ## Addon Customizing ##
+Customizing\ElvUI.lua
 Customizing\Bartender4.lua
+Customizing\RoleIcons.lua
