@@ -4,7 +4,7 @@ LingkanUI.RoleIcons = {}
 
 local defaults = {
     raid = { true, "Show role icons on the Raid tab" },
-    tooltip = { true, "Show role icons in player tooltips" },
+    tooltip = { false, "Show role icons in player tooltips" },
     chat = { true, "Show role icons in chat windows" },
     system = { true, "Show role icons in system messages" },
     debug = { false, "Debug the addon" },
