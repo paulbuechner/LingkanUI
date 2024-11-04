@@ -10,11 +10,11 @@ local WoW10 = select(4, GetBuildInfo()) >= 100000
 
 function LingkanUI.OnInitialize()
     -- Console
-    SetConsoleKey("°") -- https://wowpedia.fandom.com/wiki/Console
+    SetConsoleKey("*") -- https://wowpedia.fandom.com/wiki/Console
 
     -- CVars (https://wowpedia.fandom.com/wiki/Console_variables)
     SetCVar("CameraReduceUnexpectedMovement", 1)
-    SetCVar("RenderScale", 0.999)       -- https://www.reddit.com/r/wow/comments/z69guk/quick_tip_to_make_the_new_dragonflight_zones_look/
+    -- SetCVar("RenderScale", 0.999)       -- https://www.reddit.com/r/wow/comments/z69guk/quick_tip_to_make_the_new_dragonflight_zones_look/
     SetCVar("ResampleAlwaysSharpen", 1) -- https://www.reddit.com/r/wow/comments/z69guk/quick_tip_to_make_the_new_dragonflight_zones_look/
 
     -- Resize Extra Action Button
@@ -23,6 +23,9 @@ function LingkanUI.OnInitialize()
     -- Reanchor EndCaps Example
     -- MainMenuBar.EndCaps.RightEndCap:ClearAllPoints()
     -- MainMenuBar.EndCaps.RightEndCap:SetPoint("BOTTOMLEFT", MainMenuBar, "BOTTOMRIGHT", 412, -22)
+
+    -- Modules
+    LingkanUI.LoadTabTargetArenaFix()
 
     LingkanUI:Print("Initialized successfully!")
 end
@@ -42,6 +45,8 @@ end
 function LingkanUI:CustomizingHandler()
     -- Bartender4
     -- LingkanUI.Customizing.LoadBartender4() -- Currently handled via "Gryphons and Wyverns" WA -> Actions -> On Init
+
+    -- ElvUI
 end
 
 LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD", "CustomizingHandler")
