@@ -18,7 +18,7 @@ function LingkanUI.OnInitialize()
     SetCVar("ResampleAlwaysSharpen", 1) -- https://www.reddit.com/r/wow/comments/z69guk/quick_tip_to_make_the_new_dragonflight_zones_look/
 
     -- Resize Extra Action Button
-    ExtraActionButton1:SetScale(0.8)
+    if WoW10 then ExtraActionButton1:SetScale(0.8) end
 
     -- Reanchor EndCaps Example
     -- MainMenuBar.EndCaps.RightEndCap:ClearAllPoints()

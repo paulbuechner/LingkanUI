@@ -1,6 +1,4 @@
-## Interface: 110005
-## Interface-Classic: 11404
-## Interface-Wrath: 30403
+## Interface: 11505
 
 ## Title: LingkanUI
 
@@ -40,7 +38,7 @@ libs\AceConfig-3.0\AceConfig-3.0.xml
 
 
 ## Patches ##
-Patches\ForceLoadTradeSkillData.lua
+# ...
 
 ## Core ##
 LingkanUI.lua
@@ -48,7 +46,6 @@ LingkanUI.lua
 Core\Media\Load_Media.xml
 
 ## Modules ##
-Modules\RoleIcons.lua
 Modules\TabTargetArenaFix.lua
 
 ## Addon Customizing ##
