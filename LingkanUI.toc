@@ -1,4 +1,4 @@
-## Interface: 110005
+## Interface: 110007
 ## Interface-Classic: 11404
 ## Interface-Wrath: 30403
 
@@ -40,7 +40,7 @@ libs\AceConfig-3.0\AceConfig-3.0.xml
 
 
 ## Patches ##
-Patches\ForceLoadTradeSkillData.lua
+# Patches\ForceLoadTradeSkillData.lua
 
 ## Core ##
 LingkanUI.lua
