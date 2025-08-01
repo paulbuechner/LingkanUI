@@ -69,13 +69,18 @@ LingkanUI.options = {
                     get = function() return LingkanUI.db.profile.general.developerMode end,
                     set = function(_, value)
                         LingkanUI.db.profile.general.developerMode = value
-                        LingkanUI.debug = value
                         if value then
                             LingkanUI:Print("Developer mode enabled. Additional slash commands are now available.")
                             LingkanUI:RegisterDebugCommands()
                         else
                             LingkanUI:Print("Developer mode disabled.")
                             LingkanUI:UnregisterDebugCommands()
+                            -- Turn off all module debug modes when developer mode is disabled
+                            LingkanUI.db.profile.sheath.debug = false
+                            LingkanUI.db.profile.tabTargetArenaFix.debug = false
+                            if LingkanUI.db.profile.roleIcons then
+                                LingkanUI.db.profile.roleIcons.debug = false
+                            end
                         end
                     end,
                 },

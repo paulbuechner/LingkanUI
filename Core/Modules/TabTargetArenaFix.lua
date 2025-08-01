@@ -4,7 +4,7 @@ local _, LingkanUI = ...
 LingkanUI.TabTargetArenaFix = {}
 
 -- Module name for debug output
-local MODULE_NAME = "Tab Target Arena Fix"
+local MODULE_NAME = "tabTargetArenaFix"
 
 -- Module-specific debug function
 local function DebugPrint(message)

@@ -38,9 +38,6 @@ function LingkanUI.OnInitialize()
     -- Initialize database
     LingkanUI.db = LibStub("AceDB-3.0"):New("LingkanUIDB", LingkanUI.defaults, true)
 
-    -- Initialize debug mode from saved settings (keeping for backward compatibility)
-    LingkanUI.debug = LingkanUI.db.profile.general.developerMode
-
     -- Register options with AceConfig
     LibStub("AceConfig-3.0"):RegisterOptionsTable("LingkanUI", LingkanUI.options)
     LingkanUI.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("LingkanUI", "LingkanUI")
