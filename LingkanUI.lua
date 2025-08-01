@@ -26,6 +26,12 @@ function LingkanUI:DebugPrint(message, module)
     end
 end
 
+function LingkanUI:AddToInspector(data, strName)
+    if DevTool and self.debug then
+        DevTool:AddData(data, strName)
+    end
+end
+
 -- ------------------------------------------ Main -----------------------------------------
 
 function LingkanUI.OnInitialize()

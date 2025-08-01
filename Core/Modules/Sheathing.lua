@@ -88,7 +88,9 @@ function LingkanUI:SheatHandler()
         if mainHandLink then
             local _, _, _, _, _, _, itemSubType = C_Item.GetItemInfo(mainHandLink)
             weaponSubType = itemSubType
+
             DebugPrint("Weapon subtype: " .. tostring(weaponSubType))
+            LingkanUI:AddToInspector(weaponSubType, "Weapon Subtype")
         end
 
         if sheatType == KEEP_SHEATED and (sheathState == 2 or sheathState == 3) then
