@@ -1,6 +1,23 @@
 local ADDON_NAME, LingkanUI = ...
 
+-- Create the RoleIcons module
 LingkanUI.RoleIcons = {}
+
+-- Module name for debug output
+local MODULE_NAME = "roleIcons"
+
+-- Module-specific debug function
+local function DebugPrint(message)
+    LingkanUI:DebugPrint(message, MODULE_NAME)
+end
+
+-- Check WoW version - only enable for retail
+local WoW10 = select(4, GetBuildInfo()) >= 100000
+
+-- Get settings from LingkanUI database
+local function getSettings()
+    return LingkanUI.db and LingkanUI.db.profile.roleIcons
+end
 
 local defaults = {
     raid = { true, "Show role icons on the Raid tab" },
@@ -18,6 +35,7 @@ local defaults = {
     popup = { true, "Show role icons in unit popup menus" },
     map = { true, "Show role icons in map tooltips" },
 }
+
 local settings
 local maxlvl = GetMaxLevelForLatestExpansion()
 
@@ -74,15 +92,6 @@ local function getRoleTexCoord(role)
     if not str or #str == 0 then return nil end
     local a, b, c, d = string.match(str, ":(%d+):(%d+):(%d+):(%d+)%\124t")
     return a / 64, b / 64, c / 64, d / 64
-end
-
-local function chatMsg(msg)
-    DEFAULT_CHAT_FRAME:AddMessage("|cff6060ff" .. ADDON_NAME .. "|r: " .. msg)
-end
-local function debug(msg)
-    if settings and settings.debug then
-        chatMsg(msg)
-    end
 end
 
 local function classColor(name, class, unit)
@@ -434,7 +443,7 @@ local function UpdateRGF()
                         btn.subframes.class:SetText(txt2)
                         if txt1 ~= lvl and btn.subframes.level:IsTruncated() then
                             riconsz = riconsz - 1
-                            debug("Reduced iconsz to: " .. riconsz)
+                            DebugPrint("Reduced iconsz to: " .. riconsz)
                             UpdateRGF()
                             return
                         end
@@ -578,7 +587,7 @@ function LingkanUI.RoleIcons:UpdateServers(intt, groupjoin)
             end
             if groupjoin and islead then
                 -- joined a new group, default to assuming we are on leader's realm
-                debug("leader lastServer = " .. realm)
+                DebugPrint("leader lastServer = " .. realm)
                 LingkanUI.RoleIcons.lastServer = r
             end
         end
@@ -588,7 +597,7 @@ function LingkanUI.RoleIcons:UpdateServers(intt, groupjoin)
     if not LingkanUI.RoleIcons.lastServer and settings.state and settings.state.lastServer then -- restore lastServer from previous session
         LingkanUI.RoleIcons.lastServer = LingkanUI.RoleIcons.servers[settings.state.lastServer]
         settings.state.lastServer = nil                                                         -- only once
-        debug("Restored lastServer=" .. tostring(LingkanUI.RoleIcons.lastServer and LingkanUI.RoleIcons.lastServer.name))
+        DebugPrint("Restored lastServer=" .. tostring(LingkanUI.RoleIcons.lastServer and LingkanUI.RoleIcons.lastServer.name))
     end
 
     if not LingkanUI.RoleIcons.serverFrame then
@@ -636,7 +645,7 @@ function LingkanUI.RoleIcons:UpdateServers(intt, groupjoin)
         local curr = list[1].name
         local color
         if old and old.unknownlevel and old.num > 0 then
-            debug("level info missing for a group member on lastserver, suppressing possible transfer")
+            DebugPrint("level info missing for a group member on lastserver, suppressing possible transfer")
             color = "|cffff1919" -- red
             curr = old.name
         elseif list[1].maxlevel > list[2].maxlevel or
@@ -644,7 +653,7 @@ function LingkanUI.RoleIcons:UpdateServers(intt, groupjoin)
             color = "|cff19ff19" -- green
             LingkanUI.RoleIcons.lastServer = list[1]
         elseif list[1].num == list[2].num + 1 and old == list[2] and list[1].unknownlevel then
-            debug("level info missing for a group member on newserver, suppressing possible transfer")
+            DebugPrint("level info missing for a group member on newserver, suppressing possible transfer")
             color = "|cffff1919" -- red
             curr = old.name
         elseif list[1].num >= list[2].num + 1 then
@@ -662,7 +671,7 @@ function LingkanUI.RoleIcons:UpdateServers(intt, groupjoin)
         local new = LingkanUI.RoleIcons.lastServer
         if settings.serverinfo and not IsInInstance() and
             new and old and new ~= old then
-            debug("Probable realm transfer" .. ": " ..
+            DebugPrint("Probable realm transfer" .. ": " ..
                 old.name .. " (" .. old.num .. " " .. "Players" .. " / " .. LEVEL .. " " .. old.maxlevel .. ")  ->  " ..
                 new.name .. " (" .. new.num .. " " .. "Players" .. " / " .. LEVEL .. " " .. new.maxlevel .. ")")
         end
@@ -792,7 +801,7 @@ end
 
 local function UnitPopup_hook(menu, which, unit, name, userData)
     if not settings.popup then return end
-    debug("UnitPopup_hook: " .. tostring(which))
+    DebugPrint("UnitPopup_hook: " .. tostring(which))
     if unit and not UnitIsPlayer(unit) then return end
     if which and which:match("^BN_") then return end
     if which == "FOCUS" and unit then name = nil end -- workaround a Blizz hack
@@ -805,7 +814,7 @@ local function UnitPopup_hook(menu, which, unit, name, userData)
     if not role or role == "NONE" then role = LingkanUI.RoleIcons.rolecache[name] end
     local class = (unit and UnitExists(unit) and select(2, UnitClass(unit))) or
         LingkanUI.RoleIcons.classcache[name] or select(2, UnitClass(name))
-    debug("name=" .. name .. " unit=" .. tostring(unit) .. " class=" .. tostring(class) .. " role=" .. tostring(role))
+    DebugPrint("name=" .. name .. " unit=" .. tostring(unit) .. " class=" .. tostring(class) .. " role=" .. tostring(role))
     local cname = classColor(name, class, unit)
     if (role and role ~= "NONE") then
         cname = getRoleTex(role, 0) .. cname
@@ -862,7 +871,7 @@ function GameTooltip_Minimap_hook()
     text = text:gsub("(\124TInterface\\Minimap[^\124]+\124t)", "%1\n\n") -- ignore up/down arrow textures
     for name in string.gmatch(text, "[^\n]+") do
         if not name:find("\124") then
-            debug("GameTooltip_Minimap_hook:" .. name)
+            DebugPrint("GameTooltip_Minimap_hook:" .. name)
             local toon = LingkanUI.RoleIcons:formatToon(strtrim(name), true, true)
             --text = text:gsub("\n"..name.."\n", "\n"..toon.."\n")
             local s, e = text:find("\n" .. name .. "\n", 1, true) -- avoid gsub to prevent problems with special chars
@@ -918,19 +927,19 @@ local reg = {}
 local function RegisterHooks()
     if not settings then return end
     if settings.raid and RaidGroupFrame_Update and not reg["rgb"] then
-        debug("Registering RaidGroupFrame_Update")
+        DebugPrint("Registering RaidGroupFrame_Update")
         hooksecurefunc("RaidGroupFrame_Update", UpdateRGF)
         hooksecurefunc("RaidGroupFrame_UpdateLevel", UpdateRGF)
         reg["rgb"] = true
     end
     if settings.raid and RaidInfoFrame and not reg["rif"] then
-        debug("Registering RaidInfoframe")
+        DebugPrint("Registering RaidInfoframe")
         hooksecurefunc(RaidInfoFrame, "Show", UpdateRGF)
         hooksecurefunc(RaidInfoFrame, "Hide", UpdateRGF)
         reg["rif"] = true
     end
     if settings.tooltip and GameTooltip and not reg["gtt"] then
-        debug("Registering GameTooltip")
+        DebugPrint("Registering GameTooltip")
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data) UpdateTT(tooltip) end)
         hooksecurefunc(GameTooltipTextLeft1, "SetFormattedText", function() UpdateTT(GameTooltip) end)
         hooksecurefunc(GameTooltipTextLeft1, "SetText", function() UpdateTT(GameTooltip) end)
@@ -1081,7 +1090,7 @@ local function RegisterHooks()
                 if settings.autorole and
                     UnitGroupRolesAssigned("player") ~= "NONE" and
                     event == "ROLE_POLL_BEGIN" then
-                    debug("suppressed a RolePollPopup")
+                    DebugPrint("suppressed a RolePollPopup")
                 else
                     LingkanUI.RoleIcons.rppevent(self, event, ...)
                 end
@@ -1093,81 +1102,82 @@ end
 
 local function OnEvent(frame, event, name, ...)
     if event == "ADDON_LOADED" and string.upper(name) == string.upper(ADDON_NAME) then
-        debug("ADDON_LOADED: " .. name)
-        LingkanUI.RoleIconsDB = LingkanUI.RoleIconsDB or {}
-        settings = LingkanUI.RoleIconsDB
-        for k, v in pairs(defaults) do
-            if settings[k] == nil then
-                settings[k] = defaults[k][1]
-            end
+        DebugPrint("ADDON_LOADED: " .. name)
+        -- Settings are now managed by LingkanUI main database
+        settings = getSettings()
+        if settings and settings.enabled and WoW10 then
+            RegisterHooks()
+            LingkanUI.RoleIcons:UpdateServers()
         end
-        settings.state = settings.state or {}
-        RegisterHooks()
-        LingkanUI.RoleIcons:UpdateServers()
     elseif event == "ADDON_LOADED" then
-        debug("ADDON_LOADED: " .. name)
-        RegisterHooks()
+        DebugPrint("ADDON_LOADED: " .. name)
+        if settings and settings.enabled and WoW10 then
+            RegisterHooks()
+        end
     elseif event == "PLAYER_TARGET_CHANGED" then
-        UpdateTarget("target")
+        if settings and settings.enabled then
+            UpdateTarget("target")
+        end
     elseif event == "PLAYER_FOCUS_CHANGED" then
-        UpdateTarget("focus")
+        if settings and settings.enabled then
+            UpdateTarget("focus")
+        end
     elseif event == "ROLE_POLL_BEGIN" or
         event == "GROUP_ROSTER_UPDATE" or
         event == "ACTIVE_TALENT_GROUP_CHANGED" or
         event == "PLAYER_REGEN_ENABLED" then
-        UpdateTarget("target")
-        UpdateTarget("focus")
-        if settings.autorole and not InCombatLockdown() then
-            local currrole = UnitGroupRolesAssigned("player")
-            if (currrole == "NONE" and event ~= "ACTIVE_TALENT_GROUP_CHANGED") or
-                (currrole ~= "NONE" and event == "ACTIVE_TALENT_GROUP_CHANGED") then
-                local role = myDefaultRole()
-                if role and role ~= "NONE" then
-                    debug(event .. " setting " .. role)
-                    UnitSetRole("player", role)
-                    --RolePollPopup:Hide()
-                    StaticPopupSpecial_Hide(RolePollPopup) -- ticket 4
+        if settings and settings.enabled then
+            UpdateTarget("target")
+            UpdateTarget("focus")
+            if settings.autorole and not InCombatLockdown() then
+                local currrole = UnitGroupRolesAssigned("player")
+                if (currrole == "NONE" and event ~= "ACTIVE_TALENT_GROUP_CHANGED") or
+                    (currrole ~= "NONE" and event == "ACTIVE_TALENT_GROUP_CHANGED") then
+                    local role = myDefaultRole()
+                    if role and role ~= "NONE" then
+                        DebugPrint(event .. " setting " .. role)
+                        UnitSetRole("player", role)
+                        StaticPopupSpecial_Hide(RolePollPopup)
+                    end
                 end
             end
         end
     end
     if event == "PARTY_INVITE_REQUEST" then
         LingkanUI.RoleIcons.inviteleader = name
-        debug("PARTY_INVITE_REQUEST: " .. tostring(LingkanUI.RoleIcons.inviteleader))
+        DebugPrint("PARTY_INVITE_REQUEST: " .. tostring(LingkanUI.RoleIcons.inviteleader))
     end
     if event == "GROUP_JOINED" then
-        debug("GROUP_JOINED")
-        LingkanUI.RoleIcons:UpdateServers(false, true)
+        DebugPrint("GROUP_JOINED")
+        if settings and settings.enabled then
+            LingkanUI.RoleIcons:UpdateServers(false, true)
+        end
     end
     if event == "GROUP_ROSTER_UPDATE" then
-        LingkanUI.RoleIcons:UpdateServers()
+        if settings and settings.enabled then
+            LingkanUI.RoleIcons:UpdateServers()
+        end
     end
 end
 frame:SetScript("OnEvent", OnEvent);
 
--- SLASH_ROLEICONS1 = "/ri"
--- SlashCmdList["ROLEICONS"] = function(msg)
---     local cmd = msg:lower()
---     if cmd == "check" then
---         InitiateRolePoll()
---     elseif type(settings[cmd]) == "boolean" then
---         settings[cmd] = not settings[cmd]
---         chatMsg(cmd .. " set to " .. (settings[cmd] and YES or NO))
---         RegisterHooks()
---         UpdateRGF()
---     else
---         local usage = ""
---         chatMsg("LingkanUI " .. LingkanUI.RoleIcons.version)
---         for c, _ in pairs(defaults) do
---             usage = usage .. " | " .. c
---         end
---         chatMsg(SLASH_ROLEICONS1 .. " [ check" .. usage .. " ]")
---         chatMsg("  " .. SLASH_ROLEICONS1 .. " check  - " .. "Perform a role check (requires assist or leader)")
---         for c, v in pairs(defaults) do
---             chatMsg("  " .. SLASH_ROLEICONS1 .. " " .. c .. "  [" ..
---                 (settings[c] and "|cff00ff00" .. YES or "|cffff0000" .. NO) .. "|r] " .. v[2])
---         end
---     end
--- end
--- SLASH_ROLECHECK1 = "/rolecheck"
--- SlashCmdList["ROLECHECK"] = function(msg) InitiateRolePoll() end
+function LingkanUI.RoleIcons:Enable()
+    if not WoW10 then
+        DebugPrint("RoleIcons not available in Classic WoW")
+        return
+    end
+
+    DebugPrint("Enabling RoleIcons module")
+    settings = getSettings()
+    if settings then
+        RegisterHooks()
+        UpdateRGF()
+        self:UpdateServers()
+    end
+end
+
+function LingkanUI.RoleIcons:Disable()
+    DebugPrint("Disabling RoleIcons module")
+    -- The module doesn't have a clean disable mechanism, so we just update settings
+    settings = nil
+end

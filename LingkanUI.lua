@@ -111,6 +111,12 @@ function LingkanUI:PrintDebugInfo()
         self:Print("TabTargetArenaFix")
         self:Print("    enabled: " .. tostring(self.db.profile.tabTargetArenaFix.enabled))
         self:Print("    debug: " .. tostring(self.db.profile.tabTargetArenaFix.debug))
+
+        if WoW10 then
+            self:Print("RoleIcons")
+            self:Print("    enabled: " .. tostring(self.db.profile.roleIcons.enabled))
+            self:Print("    debug: " .. tostring(self.db.profile.roleIcons.debug))
+        end
     end
 end
 
@@ -140,6 +146,11 @@ function LingkanUI:CustomizingHandler()
     -- Initialize TabTargetArenaFix if enabled
     if self.db.profile.tabTargetArenaFix.enabled then
         LingkanUI.TabTargetArenaFix:EnableTabTargetArenaFix()
+    end
+
+    -- Initialize RoleIcons if enabled (retail only)
+    if WoW10 and self.db.profile.roleIcons.enabled then
+        LingkanUI.RoleIcons:Enable()
     end
 end
 
