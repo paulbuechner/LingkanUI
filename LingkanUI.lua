@@ -6,9 +6,48 @@ LingkanUI = LibStub("AceAddon-3.0"):NewAddon(LingkanUI, "LingkanUI", "AceConsole
 
 local WoW10 = select(4, GetBuildInfo()) >= 100000
 
+-- ---------------------------------------- Debug Functions ----------------------------------------
+
+-- Debug print function that only prints when debug mode is enabled
+function LingkanUI:DebugPrint(message, module)
+    local debugEnabled = false
+
+    if self.db and self.db.profile then
+        if self.db.profile.general.developerMode then
+            debugEnabled = true
+        elseif module and self.db.profile[module] and self.db.profile[module].debug then
+            debugEnabled = true
+        end
+    end
+
+    if debugEnabled then
+        local moduleTag = module and (" [" .. string.upper(module) .. "]") or ""
+        self:Print("[DEBUG]" .. moduleTag .. " " .. tostring(message))
+    end
+end
+
 -- ------------------------------------------ Main -----------------------------------------
 
 function LingkanUI.OnInitialize()
+    -- Initialize database
+    LingkanUI.db = LibStub("AceDB-3.0"):New("LingkanUIDB", LingkanUI.defaults, true)
+
+    -- Initialize debug mode from saved settings (keeping for backward compatibility)
+    LingkanUI.debug = LingkanUI.db.profile.general.developerMode
+
+    -- Register options with AceConfig
+    LibStub("AceConfig-3.0"):RegisterOptionsTable("LingkanUI", LingkanUI.options)
+    LingkanUI.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("LingkanUI", "LingkanUI")
+
+    -- Register slash command
+    LingkanUI:RegisterChatCommand("lingkanui", "SlashCommand")
+    LingkanUI:RegisterChatCommand("lui", "SlashCommand")
+
+    -- Register debug commands if debug mode is enabled
+    if LingkanUI.db.profile.general.developerMode then
+        LingkanUI:RegisterDebugCommands()
+    end
+
     -- Console
     SetConsoleKey("*") -- https://wowpedia.fandom.com/wiki/Console
 
@@ -24,10 +63,55 @@ function LingkanUI.OnInitialize()
     -- MainMenuBar.EndCaps.RightEndCap:ClearAllPoints()
     -- MainMenuBar.EndCaps.RightEndCap:SetPoint("BOTTOMLEFT", MainMenuBar, "BOTTOMRIGHT", 412, -22)
 
-    -- Modules
-    LingkanUI.LoadTabTargetArenaFix()
+    LingkanUI:Print("Initialized successfully!" .. (LingkanUI.db.profile.general.developerMode and " (Developer mode active)" or ""))
+end
 
-    LingkanUI:Print("Initialized successfully!")
+--------------------------------------- Slash Commands ---------------------------------------
+
+function LingkanUI:SlashCommand(input)
+    if not input or input:trim() == "" then
+        -- Open options panel
+        if WoW10 then
+            -- Retail/Dragonflight and newer
+            Settings.OpenToCategory("LingkanUI")
+        else
+            -- Classic versions - use AceConfigDialog directly
+            LibStub("AceConfigDialog-3.0"):Open("LingkanUI")
+        end
+    else
+        LingkanUI:Print("Usage: /lingkanui or /lui - Opens the options panel")
+    end
+end
+
+--------------------------------------- Debug Commands ---------------------------------------
+
+function LingkanUI:RegisterDebugCommands()
+    self:RegisterChatCommand("debuginfo", "PrintDebugInfo")
+end
+
+function LingkanUI:UnregisterDebugCommands()
+    self:UnregisterChatCommand("debuginfo")
+end
+
+function LingkanUI:PrintDebugInfo()
+    self:Print("=== LingkanUI Debug Information ===")
+    self:Print("WoW10: " .. tostring(WoW10))
+    self:Print("Build: " .. tostring(select(4, GetBuildInfo())))
+    self:Print("Developer mode: " .. tostring(self.db.profile.general.developerMode))
+    self:Print("Database loaded: " .. tostring(self.db ~= nil))
+
+    if self.db then
+        self:Print("=== Modules ===")
+
+        self:Print("Sheathing")
+        self:Print("    enabled: " .. tostring(self.db.profile.sheath.enabled))
+        self:Print("    mode: " .. tostring(self.db.profile.sheath.mode))
+        self:Print("    debug: " .. tostring(self.db.profile.sheath.debug))
+
+        self:Print("TabTargetArenaFix")
+        self:Print("    enabled: " .. tostring(self.db.profile.tabTargetArenaFix.enabled))
+        self:Print("    debug: " .. tostring(self.db.profile.tabTargetArenaFix.debug))
+    end
 end
 
 --------------------------------------- ADDON_LOADED ---------------------------------------
@@ -47,56 +131,19 @@ function LingkanUI:CustomizingHandler()
     -- LingkanUI.Customizing.LoadBartender4() -- Currently handled via "Gryphons and Wyverns" WA -> Actions -> On Init
 
     -- ElvUI
+
+    -- Initialize sheath handler if enabled
+    if self.db.profile.sheath.enabled then
+        LingkanUI.Sheathing:EnableSheathHandler()
+    end
+
+    -- Initialize TabTargetArenaFix if enabled
+    if self.db.profile.tabTargetArenaFix.enabled then
+        LingkanUI.TabTargetArenaFix:EnableTabTargetArenaFix()
+    end
 end
 
 LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD", "CustomizingHandler")
-
---------------------------------------- SheatHandler ---------------------------------------
-
-function LingkanUI:SheatHandler()
-    ---@alias KEEP_SHEATED string: Whether to keep the weapon sheathed
-    KEEP_SHEATED = "KEEP_SHEATED"
-    ---@alias KEEP_UNSHEATED string: Whether to keep the weapon unsheathed
-    KEEP_UNSHEATED = "KEEP_UNSHEATED"
-    ---@alias SHEAT_TYPE
-    ---| `KEEP_SHEATED`
-    ---| `KEEP_UNSHEATED`
-
-    -- https://www.curseforge.com/wow/addons/stay-sheathed-lite
-    -- Wheather to keep the weapon sheathed or unsheathed
-    ---@param sheatType SHEAT_TYPE: Whether to keep the weapon sheathed (`KEEP_SHEATED`) or unsheathed (`KEEP_UNSHEATED`)
-    ---@param meleeOrRanged? number: Whether to only apply to melee (1) or ranged (2) weapons (default: `nil` - both). Only applies to `KEEP_SHEATED`
-    local function SheatHandler(sheatType, meleeOrRanged)
-        --[[ --this will be for later, rework planned soon(tm)
-        local  class1, class2, class3 = UnitClass("player")
-        if class2 == "MONK" then
-            return
-        end
-        ]]
-
-        -- Variable guard
-        if (sheatType ~= KEEP_SHEATED and sheatType ~= KEEP_UNSHEATED) or
-            (meleeOrRanged ~= nil and meleeOrRanged ~= 1 and meleeOrRanged ~= 2) then
-            LingkanUI:Print("Invalid arguments for SheatHandler")
-            return
-        end
-
-        local sheathState = GetSheathState() -- Returns which type of weapon the player currently has unsheathed. (1 - none, 2 - melee, 3 - ranged)
-        if sheatType == KEEP_SHEATED and (sheathState == 2 or sheathState == 3) and
-            (meleeOrRanged == nil or sheathState == meleeOrRanged + 1) then
-            ToggleSheath()
-        elseif sheatType == KEEP_UNSHEATED and sheathState == 1 then
-            ToggleSheath()
-        end
-    end
-
-    C_Timer.After(10, function()
-        SheatHandler(KEEP_UNSHEATED)
-    end)
-end
-
--- LingkanUI:RegisterEvent("UNIT_TARGET", "SheatHandler")
--- LingkanUI:RegisterEvent("UNIT_MODEL_CHANGED", "SheatHandler")
 
 --------------------------------------- ResizeWardrobe ---------------------------------------
 
