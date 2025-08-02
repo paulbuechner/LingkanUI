@@ -38,7 +38,7 @@ local function TabTargetArenaFix()
     end
 end
 
-function LingkanUI.TabTargetArenaFix:EnableTabTargetArenaFix()
+function LingkanUI.TabTargetArenaFix:Load()
     LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD", function() TabTargetArenaFix() end)
 
     -- Apply immediately if already in game
@@ -47,8 +47,10 @@ function LingkanUI.TabTargetArenaFix:EnableTabTargetArenaFix()
     end
 end
 
-function LingkanUI.TabTargetArenaFix:DisableTabTargetArenaFix()
+function LingkanUI.TabTargetArenaFix:Unload()
     -- Reset to default tab targeting behavior
     SetBinding("TAB", "TARGETNEARESTENEMY")
     DebugPrint("Reset tab targeting to default behavior")
+
+    LingkanUI:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end

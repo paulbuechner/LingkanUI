@@ -46,11 +46,6 @@ function LingkanUI.OnInitialize()
     LingkanUI:RegisterChatCommand("lingkanui", "SlashCommand")
     LingkanUI:RegisterChatCommand("lui", "SlashCommand")
 
-    -- Register debug commands if debug mode is enabled
-    if LingkanUI.db.profile.general.developerMode then
-        LingkanUI:RegisterDebugCommands()
-    end
-
     -- Console
     SetConsoleKey("*") -- https://wowpedia.fandom.com/wiki/Console
 
@@ -86,52 +81,26 @@ function LingkanUI:SlashCommand(input)
     end
 end
 
---------------------------------------- Debug Commands ---------------------------------------
+----------------------------------------- Module ------------------------------------------
 
-function LingkanUI:RegisterDebugCommands()
-    self:RegisterChatCommand("debuginfo", "PrintDebugInfo")
-end
+function LingkanUI:ModuleHandler()
+    if self.db.profile.sheath.enabled then
+        LingkanUI.Sheathing:Load()
+    end
 
-function LingkanUI:UnregisterDebugCommands()
-    self:UnregisterChatCommand("debuginfo")
-end
+    if self.db.profile.tabTargetArenaFix.enabled then
+        LingkanUI.TabTargetArenaFix:Load()
+    end
 
-function LingkanUI:PrintDebugInfo()
-    self:Print("=== LingkanUI Debug Information ===")
-    self:Print("WoW10: " .. tostring(WoW10))
-    self:Print("Build: " .. tostring(select(4, GetBuildInfo())))
-    self:Print("Developer mode: " .. tostring(self.db.profile.general.developerMode))
-    self:Print("Database loaded: " .. tostring(self.db ~= nil))
-
-    if self.db then
-        self:Print("=== Modules ===")
-
-        self:Print("Sheathing")
-        self:Print("    enabled: " .. tostring(self.db.profile.sheath.enabled))
-        self:Print("    mode: " .. tostring(self.db.profile.sheath.mode))
-        self:Print("    debug: " .. tostring(self.db.profile.sheath.debug))
-
-        self:Print("TabTargetArenaFix")
-        self:Print("    enabled: " .. tostring(self.db.profile.tabTargetArenaFix.enabled))
-        self:Print("    debug: " .. tostring(self.db.profile.tabTargetArenaFix.debug))
-
-        if WoW10 then
-            self:Print("RoleIcons")
-            self:Print("    enabled: " .. tostring(self.db.profile.roleIcons.enabled))
-            self:Print("    debug: " .. tostring(self.db.profile.roleIcons.debug))
+    -- RETAIL ONLY
+    if WoW10 then
+        if self.db.profile.roleIcons.enabled then
+            LingkanUI.RoleIcons:Load()
         end
     end
 end
 
---------------------------------------- ADDON_LOADED ---------------------------------------
-
--- function LingkanUI:ADDON_LOADED(event, addon)
---     if addon == ADDON_NAME then
---         -- ...
---     end
--- end
-
--- LingkanUI:RegisterEvent("ADDON_LOADED")
+LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD", "ModuleHandler")
 
 --------------------------------------- Customizing ---------------------------------------
 
@@ -140,21 +109,6 @@ function LingkanUI:CustomizingHandler()
     -- LingkanUI.Customizing.LoadBartender4() -- Currently handled via "Gryphons and Wyverns" WA -> Actions -> On Init
 
     -- ElvUI
-
-    -- Initialize sheath handler if enabled
-    if self.db.profile.sheath.enabled then
-        LingkanUI.Sheathing:EnableSheathHandler()
-    end
-
-    -- Initialize TabTargetArenaFix if enabled
-    if self.db.profile.tabTargetArenaFix.enabled then
-        LingkanUI.TabTargetArenaFix:EnableTabTargetArenaFix()
-    end
-
-    -- Initialize RoleIcons if enabled (retail only)
-    if WoW10 and self.db.profile.roleIcons.enabled then
-        LingkanUI.RoleIcons:Enable()
-    end
 end
 
 LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD", "CustomizingHandler")

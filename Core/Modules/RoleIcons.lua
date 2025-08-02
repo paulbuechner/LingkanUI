@@ -1161,7 +1161,7 @@ local function OnEvent(frame, event, name, ...)
 end
 frame:SetScript("OnEvent", OnEvent);
 
-function LingkanUI.RoleIcons:Enable()
+function LingkanUI.RoleIcons:Load()
     if not WoW10 then
         DebugPrint("RoleIcons not available in Classic WoW")
         return
@@ -1176,7 +1176,7 @@ function LingkanUI.RoleIcons:Enable()
     end
 end
 
-function LingkanUI.RoleIcons:Disable()
+function LingkanUI.RoleIcons:Unload()
     DebugPrint("Disabling RoleIcons module")
     -- The module doesn't have a clean disable mechanism, so we just update settings
     settings = nil

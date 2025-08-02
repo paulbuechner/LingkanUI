@@ -70,11 +70,9 @@ LingkanUI.options = {
                     set = function(_, value)
                         LingkanUI.db.profile.general.developerMode = value
                         if value then
-                            LingkanUI:Print("Developer mode enabled. Additional slash commands are now available.")
-                            LingkanUI:RegisterDebugCommands()
+                            LingkanUI:Print("Developer mode enabled.")
                         else
                             LingkanUI:Print("Developer mode disabled.")
-                            LingkanUI:UnregisterDebugCommands()
                             -- Turn off all module debug modes when developer mode is disabled
                             LingkanUI.db.profile.sheath.debug = false
                             LingkanUI.db.profile.tabTargetArenaFix.debug = false
@@ -126,7 +124,7 @@ LingkanUI.options = {
                             set = function(_, value)
                                 LingkanUI.db.profile.sheath.enabled = value
                                 if value then
-                                    LingkanUI.Sheathing:EnableSheathHandler()
+                                    LingkanUI.Sheathing:Load()
                                 else
                                     LingkanUI.Sheathing:DisableSheathHandler()
                                 end
@@ -210,7 +208,7 @@ LingkanUI.options = {
                             set = function(_, value)
                                 LingkanUI.db.profile.tabTargetArenaFix.enabled = value
                                 if value then
-                                    LingkanUI.TabTargetArenaFix:EnableTabTargetArenaFix()
+                                    LingkanUI.TabTargetArenaFix:Load()
                                 else
                                     LingkanUI.TabTargetArenaFix:DisableTabTargetArenaFix()
                                 end
@@ -268,7 +266,7 @@ LingkanUI.options = {
                             set = function(_, value)
                                 LingkanUI.db.profile.roleIcons.enabled = value
                                 if value then
-                                    LingkanUI.RoleIcons:Enable()
+                                    LingkanUI.RoleIcons:Load()
                                 else
                                     LingkanUI.RoleIcons:Disable()
                                 end

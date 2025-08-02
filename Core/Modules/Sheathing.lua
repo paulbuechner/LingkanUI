@@ -39,7 +39,7 @@ local rangedWeaponTypes = {
     ["Zauberstäbe"] = true,  -- Wands
 }
 
-function LingkanUI.Sheathing:EnableSheathHandler()
+function LingkanUI.Sheathing:Load()
     LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD", "SheatHandler")
     LingkanUI:RegisterEvent("UNIT_TARGET", "SheatHandler")
     LingkanUI:RegisterEvent("UNIT_MODEL_CHANGED", "SheatHandler")
@@ -50,7 +50,7 @@ function LingkanUI.Sheathing:EnableSheathHandler()
     end)
 end
 
-function LingkanUI.Sheathing:DisableSheathHandler()
+function LingkanUI.Sheathing:Unload()
     LingkanUI:UnregisterEvent("PLAYER_ENTERING_WORLD")
     LingkanUI:UnregisterEvent("UNIT_TARGET")
     LingkanUI:UnregisterEvent("UNIT_MODEL_CHANGED")
