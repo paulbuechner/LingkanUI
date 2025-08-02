@@ -37,7 +37,7 @@ local defaults = {
 }
 
 local settings
-local maxlvl = GetMaxLevelForLatestExpansion()
+local maxlvl = WoW10 and GetMaxLevelForLatestExpansion() or GetRestrictedAccountData()
 
 -- tie-in for third party addons to highlight raid buttons
 -- table maps GUID => highlight = boolean
@@ -261,7 +261,7 @@ end
 local classcnt = {}
 local rolecnt = {}
 
-local LC = LocalizedClassList(false)
+local LC = WoW10 and LocalizedClassList(false) or FillLocalizedClassList({}, false)
 if GetLocale() == "enUS" then
     LC["DEATHKNIGHT"] = "DK"
 end
