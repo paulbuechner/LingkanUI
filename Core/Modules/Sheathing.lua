@@ -76,7 +76,7 @@ function LingkanUI:SheatHandler()
     -- https://www.curseforge.com/wow/addons/stay-sheathed-lite
     -- Whether to keep the weapon sheathed or unsheathed
     ---@param sheatType SHEAT_TYPE: Whether to keep the weapon sheathed (`KEEP_SHEATED`) or unsheathed (`KEEP_UNSHEATED`)
-    ---@param meleeOrRanged? number: Whether to only apply to melee (1) or ranged (2) weapons (default: `nil` - both). Only applies to `KEEP_SHEATED`
+    ---@param meleeOrRanged? number: Whether to only apply to melee (1) or ranged (2) weapons or both (3) (default: `nil` - none).
     local function SheatHandler(sheatType, meleeOrRanged)
         local sheathState = GetSheathState() -- Returns which type of weapon the player currently has unsheathed. (1 - none, 2 - melee, 3 - ranged)
 
@@ -100,6 +100,9 @@ function LingkanUI:SheatHandler()
             elseif meleeOrRanged == 2 and sheathState == 3 then
                 DebugPrint("Sheathing ranged weapon")
                 ToggleSheath()
+            elseif meleeOrRanged == 3 then
+                DebugPrint("Sheathing weapon")
+                ToggleSheath()
             end
         elseif sheatType == KEEP_UNSHEATED and sheathState == 1 then
             if meleeOrRanged == 1 then
@@ -118,18 +121,17 @@ function LingkanUI:SheatHandler()
                 else
                     DebugPrint("Skipping unsheath - not a ranged weapon: " .. tostring(weaponSubType))
                 end
+            elseif meleeOrRanged == 3 then
+                -- No filter, unsheath any weapon
+                DebugPrint("Unsheathing weapon")
+                ToggleSheath()
             end
         end
     end
 
     -- Get settings from database
     local sheatType = self.db.profile.sheath.mode
-    local meleeOrRanged = nil
-    if self.db.profile.sheath.meleeOnly then
-        meleeOrRanged = 1
-    elseif self.db.profile.sheath.rangedOnly then
-        meleeOrRanged = 2
-    end
+    local meleeOrRanged = self.db.profile.sheath.meleeOnly and self.db.profile.sheath.rangedOnly and 3 or self.db.profile.sheath.meleeOnly and 1 or self.db.profile.sheath.rangedOnly and 2 or nil
 
     SheatHandler(sheatType, meleeOrRanged)
 end
