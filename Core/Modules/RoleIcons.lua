@@ -60,6 +60,7 @@ local chats = {
     CHAT_MSG_BATTLEGROUND = 1,
 }
 
+local frame
 local TTframe, TTfunc
 
 local iconsz = 19
@@ -209,17 +210,6 @@ local function myDefaultRole()
     local role = GetSpecializationRole(tabIndex, false, false)
     return role
 end
-
-local frame = CreateFrame("Button", ADDON_NAME .. "HiddenFrame", UIParent)
-frame:RegisterEvent("ADDON_LOADED");
-frame:RegisterEvent("ROLE_POLL_BEGIN");
-frame:RegisterEvent("GROUP_ROSTER_UPDATE");
-frame:RegisterEvent("PARTY_INVITE_REQUEST");
-frame:RegisterEvent("GROUP_JOINED");
-frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
-frame:RegisterEvent("PLAYER_TARGET_CHANGED");
-frame:RegisterEvent("PLAYER_FOCUS_CHANGED");
-frame:RegisterEvent("PLAYER_REGEN_ENABLED");
 
 local function UpdateTT(tt, unit, ttline)
     if not settings.tooltip then return end
@@ -1159,7 +1149,6 @@ local function OnEvent(frame, event, name, ...)
         end
     end
 end
-frame:SetScript("OnEvent", OnEvent);
 
 function LingkanUI.RoleIcons:Load()
     if not WoW10 then
@@ -1168,6 +1157,19 @@ function LingkanUI.RoleIcons:Load()
     end
 
     DebugPrint("Enabling RoleIcons module")
+
+    frame = CreateFrame("Button", ADDON_NAME .. "HiddenFrame", UIParent)
+    frame:RegisterEvent("ADDON_LOADED");
+    frame:RegisterEvent("ROLE_POLL_BEGIN");
+    frame:RegisterEvent("GROUP_ROSTER_UPDATE");
+    frame:RegisterEvent("PARTY_INVITE_REQUEST");
+    frame:RegisterEvent("GROUP_JOINED");
+    frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
+    frame:RegisterEvent("PLAYER_TARGET_CHANGED");
+    frame:RegisterEvent("PLAYER_FOCUS_CHANGED");
+    frame:RegisterEvent("PLAYER_REGEN_ENABLED");
+    frame:SetScript("OnEvent", OnEvent);
+
     settings = getSettings()
     if settings then
         RegisterHooks()
@@ -1178,6 +1180,7 @@ end
 
 function LingkanUI.RoleIcons:Unload()
     DebugPrint("Disabling RoleIcons module")
-    -- The module doesn't have a clean disable mechanism, so we just update settings
-    settings = nil
+
+    frame:UnregisterAllEvents()
+    frame:SetScript("OnEvent", nil)
 end
