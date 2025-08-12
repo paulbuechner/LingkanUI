@@ -81,9 +81,14 @@ function LingkanUI:SlashCommand(input)
     end
 end
 
------------------------------------------ Module ------------------------------------------
+------------------------------------------- Events -------------------------------------------
 
-function LingkanUI:ModuleHandler()
+function LingkanUI:PLAYER_ENTERING_WORLD()
+    -----------------------------------------------------
+    --- Modules
+    -----------------------------------------------------
+    LingkanUI.Interface:Load()
+
     if self.db.profile.sheath.enabled then
         LingkanUI.Sheathing:Load()
     end
@@ -97,21 +102,22 @@ function LingkanUI:ModuleHandler()
         if self.db.profile.roleIcons.enabled then
             LingkanUI.RoleIcons:Load()
         end
+
+        if self.db.profile.lean.enabled then
+            LingkanUI.Leaning:Load()
+        end
     end
-end
 
-LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD", "ModuleHandler")
-
---------------------------------------- Customizing ---------------------------------------
-
-function LingkanUI:CustomizingHandler()
+    -----------------------------------------------------
+    --- Customizing
+    -----------------------------------------------------
     -- Bartender4
     -- LingkanUI.Customizing.LoadBartender4() -- Currently handled via "Gryphons and Wyverns" WA -> Actions -> On Init
 
     -- ElvUI
 end
 
-LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD", "CustomizingHandler")
+LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 --------------------------------------- ResizeWardrobe ---------------------------------------
 

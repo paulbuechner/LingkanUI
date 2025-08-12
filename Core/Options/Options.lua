@@ -8,12 +8,19 @@ LingkanUI.defaults = {
     profile = {
         general = {
             developerMode = false,
+            interface = {
+                hideUIErrors = false,
+            },
         },
         sheath = {
             enabled = false,
             mode = "KEEP_UNSHEATED", -- "KEEP_SHEATED" or "KEEP_UNSHEATED"
             meleeOnly = false,
             rangedOnly = false,
+            debug = false,
+        },
+        lean = {
+            enabled = false,
             debug = false,
         },
         tabTargetArenaFix = {
@@ -75,11 +82,28 @@ LingkanUI.options = {
                             LingkanUI:Print("Developer mode disabled.")
                             -- Turn off all module debug modes when developer mode is disabled
                             LingkanUI.db.profile.sheath.debug = false
+                            LingkanUI.db.profile.lean.debug = false
                             LingkanUI.db.profile.tabTargetArenaFix.debug = false
                             if LingkanUI.db.profile.roleIcons then
                                 LingkanUI.db.profile.roleIcons.debug = false
                             end
                         end
+                    end,
+                },
+                interfaceHeader = {
+                    name = "Interface Settings",
+                    type = "header",
+                    order = 4,
+                },
+                hideUIErrors = {
+                    name = "Hide UI Errors",
+                    desc = "Hide UI error messages from appearing on screen",
+                    type = "toggle",
+                    order = 5,
+                    get = function() return LingkanUI.db.profile.general.interface.hideUIErrors end,
+                    set = function(_, value)
+                        LingkanUI.db.profile.general.interface.hideUIErrors = value
+                        LingkanUI.Interface:ApplyInterfaceSettings()
                     end,
                 },
             }
@@ -90,6 +114,48 @@ LingkanUI.options = {
             order = 2,
             childGroups = "tab",
             args = {
+                lean = {
+                    name = "Leaning",
+                    type = "group",
+                    order = 2,
+                    args = {
+                        debug = {
+                            name = "Debug Mode",
+                            desc = "Enable debug logging for leaning",
+                            type = "toggle",
+                            order = 1,
+                            get = function() return LingkanUI.db.profile.lean.debug end,
+                            set = function(_, value) LingkanUI.db.profile.lean.debug = value end,
+                            disabled = function() return not LingkanUI.db.profile.lean.enabled end,
+                            hidden = function() return not LingkanUI.db.profile.general.developerMode end,
+                        },
+                        header = {
+                            name = "Leaning Settings",
+                            type = "header",
+                            order = 2,
+                        },
+                        description = {
+                            name = "Automatically execute the /lean console command when triggered.",
+                            type = "description",
+                            order = 3,
+                        },
+                        enabled = {
+                            name = "Enable Leaning",
+                            desc = "Enable automatic leaning command execution",
+                            type = "toggle",
+                            order = 4,
+                            get = function() return LingkanUI.db.profile.lean.enabled end,
+                            set = function(_, value)
+                                LingkanUI.db.profile.lean.enabled = value
+                                if value then
+                                    LingkanUI.Leaning:Load()
+                                else
+                                    LingkanUI.Leaning:Unload()
+                                end
+                            end,
+                        },
+                    }
+                },
                 sheath = {
                     name = "Sheath Control",
                     type = "group",
@@ -126,7 +192,7 @@ LingkanUI.options = {
                                 if value then
                                     LingkanUI.Sheathing:Load()
                                 else
-                                    LingkanUI.Sheathing:DisableSheathHandler()
+                                    LingkanUI.Sheathing:Unload()
                                 end
                             end,
                         },
@@ -210,7 +276,7 @@ LingkanUI.options = {
                                 if value then
                                     LingkanUI.TabTargetArenaFix:Load()
                                 else
-                                    LingkanUI.TabTargetArenaFix:DisableTabTargetArenaFix()
+                                    LingkanUI.TabTargetArenaFix:Unload()
                                 end
                             end,
                         },
@@ -268,7 +334,7 @@ LingkanUI.options = {
                                 if value then
                                     LingkanUI.RoleIcons:Load()
                                 else
-                                    LingkanUI.RoleIcons:Disable()
+                                    LingkanUI.RoleIcons:Unload()
                                 end
                             end,
                         },
