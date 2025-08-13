@@ -10,11 +10,12 @@ local WoW10 = select(4, GetBuildInfo()) >= 100000
 
 -- Debug print function that only prints when debug mode is enabled
 function LingkanUI:DebugPrint(message, module)
-    local debugEnabled = false
-
-    if module and self.db and self.db.profile and self.db.profile[module] and self.db.profile[module].debug then
-        debugEnabled = true
+    if not (module and self.db and self.db.profile) then
+        return
     end
+
+    local debugEnabled = (self.db.profile[module] and self.db.profile[module].debug) or -- Module specific
+        (self.db.profile.general[module] and self.db.profile.general[module].debug)     -- General Settings
 
     if debugEnabled then
         local moduleTag = module and (" [" .. string.upper(module) .. "]") or ""
