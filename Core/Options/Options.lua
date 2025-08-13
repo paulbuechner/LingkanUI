@@ -9,6 +9,7 @@ LingkanUI.defaults = {
         general = {
             developerMode = false,
             interface = {
+                debug = false,
                 hideUIErrors = false,
             },
         },
@@ -78,9 +79,11 @@ LingkanUI.options = {
                         LingkanUI.db.profile.general.developerMode = value
                         if value then
                             LingkanUI:Print("Developer mode enabled.")
+                            LingkanUI.db.profile.general.interface.debug = true
                         else
                             LingkanUI:Print("Developer mode disabled.")
                             -- Turn off all module debug modes when developer mode is disabled
+                            LingkanUI.db.profile.general.interface.debug = false
                             LingkanUI.db.profile.sheath.debug = false
                             LingkanUI.db.profile.lean.debug = false
                             LingkanUI.db.profile.tabTargetArenaFix.debug = false
