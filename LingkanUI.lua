@@ -12,12 +12,8 @@ local WoW10 = select(4, GetBuildInfo()) >= 100000
 function LingkanUI:DebugPrint(message, module)
     local debugEnabled = false
 
-    if self.db and self.db.profile then
-        if self.db.profile.general.developerMode then
-            debugEnabled = true
-        elseif module and self.db.profile[module] and self.db.profile[module].debug then
-            debugEnabled = true
-        end
+    if module and self.db and self.db.profile and self.db.profile[module] and self.db.profile[module].debug then
+        debugEnabled = true
     end
 
     if debugEnabled then
