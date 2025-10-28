@@ -28,24 +28,9 @@ end
 -- Remix detection (buff spellID 1232454 present on player)
 local REMIX_SPELL_ID = 1232454
 function versionUtil:IsRemix()
-    -- Primary: modern C_UnitAuras API (no allocations, fastest path)
     if C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID then
         local aura = C_UnitAuras.GetPlayerAuraBySpellID(REMIX_SPELL_ID)
         return aura ~= nil
-    end
-    -- Secondary: AuraUtil (still retail, older pattern)
-    if AuraUtil and AuraUtil.FindAuraBySpellID then
-        local name = AuraUtil.FindAuraBySpellID(REMIX_SPELL_ID, "player")
-        return name ~= nil
-    end
-    -- Fallback: legacy UnitAura scan
-    local unitAuraFunc = _G and rawget(_G, 'UnitAura') or nil
-    if unitAuraFunc then
-        for i = 1, 40 do
-            local _, _, _, _, _, _, _, _, _, spellId = unitAuraFunc("player", i)
-            if not spellId then break end
-            if spellId == REMIX_SPELL_ID then return true end
-        end
     end
     return false
 end
