@@ -16,6 +16,8 @@ local NUM_SOCKET_TEXTURES = 4;
 local ILVL_ENCHANT_TEXT_SCALE = 0.9;
 local INSPECT_ILVL_TEXT_SCALE = 0.63;
 
+local shouldDisplayEnchantMissingTextOverride = false
+
 local expansionRequiredSockets = {
     [10] = {
         [INVSLOT_NECK] = 2,
@@ -525,7 +527,7 @@ local function UpdateAdditionalDisplay(button, unit)
             additionalFrame.enchantDisplay:SetText("")
         elseif (not enchantText) then
             local shouldDisplayEnchantMissingText = canEnchant and itemLink and IsLevelAtEffectiveMaxLevel(UnitLevel(unit));
-            additionalFrame.enchantDisplay:SetText(shouldDisplayEnchantMissingText and "|cffff0000No Enchant|r" or "");
+            additionalFrame.enchantDisplay:SetText(shouldDisplayEnchantMissingText and shouldDisplayEnchantMissingTextOverride and "|cffff0000No Enchant|r" or "");
         else
             --trim size
             local maxSize = 18;
