@@ -23,6 +23,15 @@ local function CheckMovement()
         return
     end
 
+    -- Don't start timer if player is mounted, casting, or in combat
+    if IsMounted() or UnitCastingInfo("player") or UnitChannelInfo("player") or UnitAffectingCombat("player") then
+        if stopTimer then
+            stopTimer:Cancel()
+            stopTimer = nil
+        end
+        return
+    end
+
     local x, y = UnitPosition("player")
     if not x or not y then
         return
