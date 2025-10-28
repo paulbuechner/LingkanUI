@@ -57,13 +57,6 @@ LingkanUI.defaults = {
     }
 }
 
--- Stub WoW globals for external linters (ignored in-game if already defined)
-_G.StaticPopupDialogs = _G.StaticPopupDialogs or {}
-_G.StaticPopup_Show = _G.StaticPopup_Show or function(...) end
-_G.ReloadUI = _G.ReloadUI or function() end
-_G.RELOADUI = _G.RELOADUI or "Reload UI"
-_G.CANCEL = _G.CANCEL or "Cancel"
-
 -- Generic multi-module option staging & reload popup system
 -- Allows any module (profile key) to stage multiple changes, present a single reload popup, and revert all on cancel.
 LingkanUI._reloadStage = LingkanUI._reloadStage or { modules = {} }
