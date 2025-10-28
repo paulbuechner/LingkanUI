@@ -45,6 +45,9 @@ Libs\AceConfig-3.0\AceConfig-3.0.xml
 # Patches\ForceLoadTradeSkillData.lua
 
 ## Core ##
+Core\Utils\BlizzAPI.lua
+
+Core\Modules\BetterCharacterPanel.lua
 Core\Modules\Interface.lua
 Core\Modules\RoleIcons.lua
 Core\Modules\Leaning.lua

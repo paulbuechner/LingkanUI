@@ -94,6 +94,10 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
         LingkanUI.TabTargetArenaFix:Load()
     end
 
+    if self.db.profile.betterCharacterPanel.enabled then
+        LingkanUI.BetterCharacterPanel:Load()
+    end
+
     -- RETAIL ONLY
     if WoW10 then
         if self.db.profile.roleIcons.enabled then
@@ -104,7 +108,6 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
             LingkanUI.Leaning:Load()
         end
     end
-
     -----------------------------------------------------
     --- Customizing
     -----------------------------------------------------
@@ -115,22 +118,3 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
 end
 
 LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD")
-
---------------------------------------- ResizeWardrobe ---------------------------------------
-
-function LingkanUI:ResizeWardrobeHandler()
-    -- https://github.com/eSkiSo/TransmogrifyResize
-    if CollectionsJournal ~= nil then
-        CollectionsJournal:SetWidth(750);
-        CollectionsJournal:SetHeight(600);
-
-        -- CollectionsJournal:ClearAllPoints();
-        -- CollectionsJournal:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
-    end
-
-    WardrobeFrame:SetUserPlaced(true);
-end
-
-if WoW10 then
-    -- LingkanUI:RegisterEvent("TRANSMOG_SEARCH_UPDATED", "ResizeWardrobeHandler")
-end

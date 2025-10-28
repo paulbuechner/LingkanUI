@@ -45,9 +45,160 @@ LingkanUI.defaults = {
             popup = true,
             map = true,
             debug = false,
-        }
+        },
+        betterCharacterPanel = {
+            enabled = false,
+            debug = false,
+            showItemLevel = true,
+            showEnchants = true,
+            showDurability = true,
+            showSockets = true,
+        },
     }
 }
+
+-- Stub WoW globals for external linters (ignored in-game if already defined)
+_G.StaticPopupDialogs = _G.StaticPopupDialogs or {}
+_G.StaticPopup_Show = _G.StaticPopup_Show or function(...) end
+_G.ReloadUI = _G.ReloadUI or function() end
+_G.RELOADUI = _G.RELOADUI or "Reload UI"
+_G.CANCEL = _G.CANCEL or "Cancel"
+
+-- Generic multi-module option staging & reload popup system
+-- Allows any module (profile key) to stage multiple changes, present a single reload popup, and revert all on cancel.
+LingkanUI._reloadStage = LingkanUI._reloadStage or { modules = {} }
+
+-- Internal: count total dirty changes across all modules
+local function ReloadStage_TotalDirty()
+    local total = 0
+    for _, data in pairs(LingkanUI._reloadStage.modules) do
+        for _ in pairs(data.dirty) do total = total + 1 end
+    end
+    return total
+end
+
+-- Internal: build multiline summary of pending changes
+local function ReloadStage_Summary()
+    local lines = {}
+    for moduleName, data in pairs(LingkanUI._reloadStage.modules) do
+        local count = 0
+        for _ in pairs(data.dirty) do count = count + 1 end
+        if count > 0 then
+            table.insert(lines, string.format("- %s: %d", moduleName, count))
+        end
+    end
+    table.sort(lines)
+    return table.concat(lines, "\n")
+end
+
+local function ReloadStage_UpdatePopup()
+    if not StaticPopup_FindVisible then return end
+    local frame = StaticPopup_FindVisible("LINGKANUI_RELOAD_PENDING")
+    if frame and frame.text then
+        local total = ReloadStage_TotalDirty()
+        local modules = 0
+        for name, data in pairs(LingkanUI._reloadStage.modules) do
+            for _ in pairs(data.dirty) do
+                modules = modules + 1; break
+            end
+        end
+        local summary = ReloadStage_Summary()
+        frame.text:SetText(string.format(
+            "LingkanUI settings changed (%d pending across %d module%s).\nReload UI to apply or Cancel to revert.\n\n%s",
+            total,
+            modules,
+            modules == 1 and "" or "s",
+            summary ~= "" and summary or "(No staged changes)"
+        ))
+    end
+end
+
+-- Public API: Stage a change for a given module (profile root key) & option key
+function LingkanUI:StageOptionChange(moduleName, optionKey, newValue)
+    if not self.db or not self.db.profile then return end
+    local moduleProfile = self.db.profile[moduleName]
+    if not moduleProfile then return end
+    local oldValue = moduleProfile[optionKey]
+    if oldValue == newValue then return end
+
+    local stage = self._reloadStage.modules[moduleName]
+    if not stage then
+        stage = { originals = {}, dirty = {} }
+        self._reloadStage.modules[moduleName] = stage
+    end
+    -- Record original only once
+    if stage.originals[optionKey] == nil then
+        stage.originals[optionKey] = oldValue
+    end
+
+    -- Apply staged value immediately so UI reflects it
+    moduleProfile[optionKey] = newValue
+    stage.dirty[optionKey] = true
+
+    -- If user toggles back to original value, clear dirty state for that key
+    if newValue == stage.originals[optionKey] then
+        stage.dirty[optionKey] = nil
+        -- If no dirty left for module remove module entry
+        local any
+        for _ in pairs(stage.dirty) do
+            any = true
+            break
+        end
+        if not any then
+            self._reloadStage.modules[moduleName] = nil
+        end
+    end
+
+    -- Manage popup lifecycle
+    if not (StaticPopup_FindVisible and StaticPopup_FindVisible("LINGKANUI_RELOAD_PENDING")) then
+        if not StaticPopupDialogs["LINGKANUI_RELOAD_PENDING"] then
+            StaticPopupDialogs["LINGKANUI_RELOAD_PENDING"] = {
+                text = "LingkanUI settings changed. Reload UI to apply or Cancel to revert.",
+                button1 = _G.RELOADUI or "Reload UI",
+                button2 = _G.CANCEL or "Cancel",
+                OnAccept = function() if ReloadUI then ReloadUI() end end,
+                OnCancel = function()
+                    local db = LingkanUI.db and LingkanUI.db.profile
+                    if db then
+                        for modName, data in pairs(LingkanUI._reloadStage.modules) do
+                            local modProfile = db[modName]
+                            if modProfile then
+                                for k, _ in pairs(data.dirty) do
+                                    local orig = data.originals[k]
+                                    if orig ~= nil then
+                                        modProfile[k] = orig
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    -- Reset staging tables
+                    LingkanUI._reloadStage.modules = {}
+                    if LibStub and LibStub("AceConfigRegistry-3.0", true) then
+                        LibStub("AceConfigRegistry-3.0"):NotifyChange(ADDON_NAME)
+                    end
+                end,
+                OnShow = function() ReloadStage_UpdatePopup() end,
+                timeout = 0,
+                whileDead = 1,
+                hideOnEscape = 1,
+                preferredIndex = 3,
+            }
+        end
+        StaticPopup_Show("LINGKANUI_RELOAD_PENDING")
+    else
+        ReloadStage_UpdatePopup()
+        -- If no staged changes left, hide popup automatically
+        if ReloadStage_TotalDirty() == 0 then
+            local frame = StaticPopup_FindVisible("LINGKANUI_RELOAD_PENDING")
+            if frame then frame:Hide() end
+        end
+    end
+
+    if LibStub and LibStub("AceConfigRegistry-3.0", true) then
+        LibStub("AceConfigRegistry-3.0"):NotifyChange(ADDON_NAME)
+    end
+end
 
 -- Options table for AceConfig
 LingkanUI.options = {
@@ -469,6 +620,87 @@ LingkanUI.options = {
                                     order = 2,
                                     get = function() return LingkanUI.db.profile.roleIcons.autorole end,
                                     set = function(_, value) LingkanUI.db.profile.roleIcons.autorole = value end,
+                                },
+                            }
+                        },
+                    }
+                },
+                betterCharacterPanel = {
+                    name = "Better Character Panel",
+                    type = "group",
+                    order = 5,
+                    args = {
+                        reloadInfo = {
+                            name = "Changing display options requires a UI reload to fully apply changes.",
+                            type = "description",
+                            order = 0,
+                        },
+                        debug = {
+                            name = "Debug Mode",
+                            desc = "Enable debug logging for Better Character Panel",
+                            type = "toggle",
+                            order = 1,
+                            get = function() return LingkanUI.db.profile.betterCharacterPanel.debug end,
+                            set = function(_, value) LingkanUI.db.profile.betterCharacterPanel.debug = value end,
+                            disabled = function() return not LingkanUI.db.profile.betterCharacterPanel.enabled end,
+                            hidden = function() return not LingkanUI.db.profile.general.developerMode end,
+                        },
+                        header = {
+                            name = "Display Settings",
+                            type = "header",
+                            order = 2,
+                        },
+                        description = {
+                            name = "Enhances the character and inspect panels with item level, enchants, sockets, and durability bars.",
+                            type = "description",
+                            order = 3,
+                        },
+                        enabled = {
+                            name = "Enable Better Character Panel",
+                            desc = "Enable enhanced character and inspect panel display (reload required)",
+                            type = "toggle",
+                            order = 4,
+                            get = function() return LingkanUI.db.profile.betterCharacterPanel.enabled end,
+                            set = function(_, value) LingkanUI:StageOptionChange("betterCharacterPanel", "enabled", value) end,
+                        },
+                        displayOptions = {
+                            name = "Display Options",
+                            type = "group",
+                            order = 5,
+                            inline = true,
+                            disabled = function() return not LingkanUI.db.profile.betterCharacterPanel.enabled end,
+                            args = {
+                                showItemLevel = {
+                                    name = "Item Level",
+                                    desc = "Display item level text on equipment slots.",
+                                    type = "toggle",
+                                    order = 1,
+                                    get = function() return LingkanUI.db.profile.betterCharacterPanel.showItemLevel end,
+                                    set = function(_, value) LingkanUI:StageOptionChange("betterCharacterPanel", "showItemLevel", value) end,
+                                },
+                                showEnchants = {
+                                    name = "Enchants",
+                                    desc = "Display enchant text (or missing enchant warning).",
+                                    type = "toggle",
+                                    order = 2,
+                                    get = function() return LingkanUI.db.profile.betterCharacterPanel.showEnchants end,
+                                    set = function(_, value) LingkanUI:StageOptionChange("betterCharacterPanel", "showEnchants", value) end,
+                                },
+                                showDurability = {
+                                    name = "Durability Bar",
+                                    desc = "Display durability bar when below 100%.",
+                                    type = "toggle",
+                                    order = 3,
+                                    get = function() return LingkanUI.db.profile.betterCharacterPanel.showDurability end,
+                                    set = function(_, value) LingkanUI:StageOptionChange("betterCharacterPanel", "showDurability", value) end,
+                                },
+                                showSockets = {
+                                    name = "Sockets & Gems",
+                                    desc = "Display socket and gem icons (empty sockets in red).",
+                                    type = "toggle",
+                                    order = 4,
+                                    get = function() return LingkanUI.db.profile.betterCharacterPanel.showSockets end,
+                                    set = function(_, value) LingkanUI:StageOptionChange("betterCharacterPanel", "showSockets", value) end,
                                 },
                             }
                         },
