@@ -40,6 +40,10 @@ Libs\AceConfig-3.0\AceConfig-3.0.xml
 # Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 #@end-no-lib-strip@
 
+# Locales #
+Locale/enUS.lua
+Locale/deDE.lua
+Locale/Lang.lua
 
 ## Patches ##
 # Patches\ForceLoadTradeSkillData.lua

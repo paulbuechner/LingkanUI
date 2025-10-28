@@ -84,24 +84,25 @@ if (isMop) then
 
     enchantReplacementTable =
     {
-        ["Stamina"] = "Stam",
-        ["Intellect"] = "Int",
-        ["Agility"] = "Agi",
-        ["Strength"] = "Str",
+        [LingkanUI:GT("LID_ENCH_STAMINA")] = "Stam",
+        [LingkanUI:GT("LID_ENCH_INTELLECT")] = "Int",
+        [LingkanUI:GT("LID_ENCH_AGILITY")] = "Agi",
+        [LingkanUI:GT("LID_ENCH_STRENGTH")] = "Str",
 
-        ["Mastery"] = "Mast",
-        ["Versatility"] = "Vers",
-        ["Critical Strike"] = "Crit",
-        ["Haste"] = "Haste",
-        ["Avoidance"] = "Avoid",
+        [LingkanUI:GT("LID_ENCH_MASTERY")] = "Mast",
+        [LingkanUI:GT("LID_ENCH_VERSATILITY")] = "Vers",
+        [LingkanUI:GT("LID_ENCH_CRITICAL_STRIKE")] = "Crit",
+        [LingkanUI:GT("LID_ENCH_HASTE")] = "Haste",
+        [LingkanUI:GT("LID_ENCH_AVOIDANCE")] = "Avoid",
 
-        ["Rating"] = "",
-        ["rating"] = "",
+        [LingkanUI:GT("LID_ENCH_RATING_UPPER")] = "",
+        [LingkanUI:GT("LID_ENCH_RATING_LOWER")] = "",
 
-        ["Minor"] = "Min",
-        ["Movement"] = "Move",
+        [LingkanUI:GT("LID_ENCH_MINOR")] = "Min",
+        [LingkanUI:GT("LID_ENCH_MOVEMENT")] = "Move",
 
-        [" and "] = " ",
+        [LingkanUI:GT("LID_ENCH_AND_SPACED")] = " ",
+        ["+"] = "", -- ensure plus stripped here too for MoP branch
     };
 
     local function hasEnchant(itemLink)
@@ -191,57 +192,51 @@ if (isMop) then
         return slotsThatHaveEnchants[slot];
     end
 else
-    enchantReplacementTable =
-    {
-        ["Stamina"] = "Stam",
-        ["Intellect"] = "Int",
-        ["Agility"] = "Agi",
-        ["Strength"] = "Str",
-
-        ["Mastery"] = "Mast",
-        ["Versatility"] = "Vers",
-        ["Critical Strike"] = "Crit",
-        ["Haste"] = "Haste",
-        ["Avoidance"] = "Avoid",
-
-        ["Minor Speed Increase"] = "Speed",
-        ["Homebound Speed"] = "Speed & HS Red.",
-        ["Plainsrunner's Breeze"] = "Speed",
-        ["Graceful Avoid"] = "Avoid",
-        ["Regenerative Leech"] = "Leech",
-        ["Watcher's Loam"] = "Stam",
-        ["Rider's Reassurance"] = "Mount Speed",
-        ["Accelerated Agility"] = "Speed & Agi",
-        ["Reserve of Int"] = "Mana & Int",
-        ["Sustained Str"] = "Stam & Str",
-        ["Waking Stats"] = "Primary Stat",
-
-        ["Cavalry's March"] = "Mount Speed",
-        ["Scout's March"] = "Speed",
-
-        ["Defender's March"] = "Stam",
-        ["Stormrider's Agi"] = "Agi & Speed",
-        ["Council's Intellect"] = "Int & Mana",
-        ["Crystalline Radiance"] = "Primary Stat",
-        ["Oathsworn's Strength"] = "Str & Stam",
-
-        ["Chant of Armored Avoid"] = "Avoid",
-        ["Chant of Armored Leech"] = "Leech",
-        ["Chant of Armored Speed"] = "Speed",
-        ["Chant of Winged Grace"] = "Avoid & FallDmg",
-        ["Chant of Leeching Fangs"] = "Leech & Recup",
-        ["Chant of Burrowing Rapidity"] = "Speed & HScd",
-
-        ["Cursed Haste"] = "Haste & \124cffcc0000-Vers\124r",
-        ["Cursed Crit"] = "Crit & \124cffcc0000-Haste\124r",
-        ["Cursed Mastery"] = "Mast & \124cffcc0000-Crit\124r",
-        ["Cursed Versatility"] = "Vers & \124cffcc0000-Mast\124r",
-
-        ["Shadowed Belt Clasp"] = "Stamina",
-
-        ["Incandescent Essence"] = "Essence",
-        -- strip all +, we are starved for space
-        ["+"] = "",
+    enchantReplacementTable = {
+        [LingkanUI:GT("LID_ENCH_STAMINA")]                    = "Stam",
+        [LingkanUI:GT("LID_ENCH_INTELLECT")]                  = "Int",
+        [LingkanUI:GT("LID_ENCH_AGILITY")]                    = "Agi",
+        [LingkanUI:GT("LID_ENCH_STRENGTH")]                   = "Str",
+        [LingkanUI:GT("LID_ENCH_MASTERY")]                    = "Mast",
+        [LingkanUI:GT("LID_ENCH_VERSATILITY")]                = "Vers",
+        [LingkanUI:GT("LID_ENCH_CRITICAL_STRIKE")]            = "Crit",
+        [LingkanUI:GT("LID_ENCH_HASTE")]                      = "Haste",
+        [LingkanUI:GT("LID_ENCH_AVOIDANCE")]                  = "Avoid",
+        [LingkanUI:GT("LID_ENCH_MINOR_SPEED_INCREASE")]       = "Speed",
+        [LingkanUI:GT("LID_ENCH_HOMEBOUND_SPEED")]            = "Speed & HS Red.",
+        [LingkanUI:GT("LID_ENCH_PLAINSRUNNERS_BREEZE")]       = "Speed",
+        [LingkanUI:GT("LID_ENCH_GRACEFUL_AVOID")]             = "Avoid",
+        [LingkanUI:GT("LID_ENCH_REGENERATIVE_LEECH")]         = "Leech",
+        [LingkanUI:GT("LID_ENCH_WATCHERS_LOAM")]              = "Stam",
+        [LingkanUI:GT("LID_ENCH_RIDERS_REASSURANCE")]         = "Mount Speed",
+        [LingkanUI:GT("LID_ENCH_ACCELERATED_AGILITY")]        = "Speed & Agi",
+        [LingkanUI:GT("LID_ENCH_RESERVE_OF_INT")]             = "Mana & Int",
+        [LingkanUI:GT("LID_ENCH_SUSTAINED_STR")]              = "Stam & Str",
+        [LingkanUI:GT("LID_ENCH_WAKING_STATS")]               = "Primary Stat",
+        [LingkanUI:GT("LID_ENCH_CAVALRYS_MARCH")]             = "Mount Speed",
+        [LingkanUI:GT("LID_ENCH_SCOUTS_MARCH")]               = "Speed",
+        [LingkanUI:GT("LID_ENCH_DEFENDERS_MARCH")]            = "Stam",
+        [LingkanUI:GT("LID_ENCH_STORMRIDERS_AGI")]            = "Agi & Speed",
+        [LingkanUI:GT("LID_ENCH_COUNCILS_INTELLECT")]         = "Int & Mana",
+        [LingkanUI:GT("LID_ENCH_SUNSET_SPELLTHREAD")]         = "Int & Stam",
+        [LingkanUI:GT("LID_ENCH_CRYSTALLINE_RADIANCE")]       = "Primary Stat",
+        [LingkanUI:GT("LID_ENCH_OATHSWORNS_STRENGTH")]        = "Str & Stam",
+        [LingkanUI:GT("LID_ENCH_CHANT_ARMORED_AVOID")]        = "Avoid",
+        [LingkanUI:GT("LID_ENCH_CHANT_ARMORED_LEECH")]        = "Leech",
+        [LingkanUI:GT("LID_ENCH_CHANT_ARMORED_SPEED")]        = "Speed",
+        [LingkanUI:GT("LID_ENCH_CHANT_WINGED_GRACE")]         = "Avoid & FallDmg",
+        [LingkanUI:GT("LID_ENCH_CHANT_LEECHING_FANGS")]       = "Leech & Recup",
+        [LingkanUI:GT("LID_ENCH_CHANT_BURROWING_RAPIDITY")]   = "Speed & HScd",
+        [LingkanUI:GT("LID_ENCH_CURSED_HASTE")]               = "Haste & \124cffcc0000-Vers\124r",
+        [LingkanUI:GT("LID_ENCH_CURSED_CRIT")]                = "Crit & \124cffcc0000-Haste\124r",
+        [LingkanUI:GT("LID_ENCH_CURSED_MASTERY")]             = "Mast & \124cffcc0000-Crit\124r",
+        [LingkanUI:GT("LID_ENCH_CURSED_VERSATILITY")]         = "Vers & \124cffcc0000-Mast\124r",
+        [LingkanUI:GT("LID_ENCH_SHADOWED_BELT_CLASP")]        = "Stamina",
+        [LingkanUI:GT("LID_ENCH_INCANDESCENT_ESSENCE")]       = "Essence",
+        -- Weapon enchants
+        [LingkanUI:GT("LID_ENCH_AUTHORITY_OF_RADIANT_POWER")] = "Radiant Power",
+        -- Misc
+        ["+"]                                                 = "",
     };
 
     local enchantPattern = ENCHANTED_TOOLTIP_LINE:gsub('%%s', '(.*)');
@@ -311,27 +306,29 @@ else
     end
 end
 
-local function pairsByKeys(t, f)
-    local a = {}
-    for n in pairs(t) do table.insert(a, n) end
-    table.sort(a, f)
-    local i = 0             -- iterator variable
-    local iter = function() -- iterator function
-        i = i + 1
-        if a[i] == nil then
-            return nil
-        else
-            return a[i], t[a[i]]
-        end
-    end
-    return iter
+local function escapePattern(text)
+    return text:gsub("(%W)", "%%%1")
 end
 
 function ProcessEnchantText(enchantText)
-    for seek, replacement in pairsByKeys(enchantReplacementTable) do
-        enchantText = enchantText:gsub(seek, replacement);
+    -- Collect keys and sort by length descending for longest match first to avoid partial early replacements
+    local keys = {}
+    for k in pairs(enchantReplacementTable) do table.insert(keys, k) end
+    table.sort(keys, function(a, b)
+        local la, lb = #a, #b
+        if la == lb then
+            return a < b -- deterministic fallback
+        end
+        return la > lb
+    end)
+
+    for _, seek in ipairs(keys) do
+        local replacement = enchantReplacementTable[seek]
+        -- Escape Lua pattern magic so we do literal matching
+        local pattern = escapePattern(seek)
+        enchantText = enchantText:gsub(pattern, replacement)
     end
-    return enchantText;
+    return enchantText
 end
 
 local function ColorGradient(perc, ...)
