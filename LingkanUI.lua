@@ -48,7 +48,7 @@ function LingkanUI.OnInitialize()
     SetCVar("ResampleAlwaysSharpen", 1) -- https://www.reddit.com/r/wow/comments/z69guk/quick_tip_to_make_the_new_dragonflight_zones_look/
 
     -- Resize Extra Action Button
-    if LingkanUI.Version:IsRetail() then ExtraActionButton1:SetScale(0.8) end
+    if LingkanUI.Version.isRetail then ExtraActionButton1:SetScale(0.8) end
 
     -- Reanchor EndCaps Example
     -- MainMenuBar.EndCaps.RightEndCap:ClearAllPoints()
@@ -62,7 +62,7 @@ end
 function LingkanUI:SlashCommand(input)
     if not input or input:trim() == "" then
         -- Open options panel
-        if LingkanUI.Version:IsRetail() then
+        if LingkanUI.Version.isRetail then
             -- Retail/Dragonflight and newer
             Settings.OpenToCategory("LingkanUI")
         else
@@ -95,7 +95,7 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
     end
 
     -- RETAIL ONLY
-    if LingkanUI.Version:IsRetail() then
+    if LingkanUI.Version.isRetail then
         if self.db.profile.roleIcons.enabled then
             LingkanUI.RoleIcons:Load()
         end
@@ -113,4 +113,11 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
     -- ElvUI
 end
 
+function LingkanUI:FIRST_FRAME_RENDERED()
+    -- Initialize version detection
+    -- NOTE: Remix Mode detection requires first frame rendered (buff check)
+    LingkanUI.Version:Init()
+end
+
 LingkanUI:RegisterEvent("PLAYER_ENTERING_WORLD")
+LingkanUI:RegisterEvent("FIRST_FRAME_RENDERED")

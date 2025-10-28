@@ -10,15 +10,11 @@ local function DebugPrint(msg)
     LingkanUI:DebugPrint(msg, MODULE_NAME)
 end
 
-local isMop = LingkanUI.Version:IsMop()
-local isRemix = LingkanUI.Version:IsRemix()
-
 local NUM_SOCKET_TEXTURES = 4;
 local ILVL_ENCHANT_TEXT_SCALE = 0.9;
 local INSPECT_ILVL_TEXT_SCALE = 0.63;
 
 local shouldDisplayEnchantMissingTextOverride = false
-local shouldDisplaySocketOverride = not isRemix
 
 local expansionRequiredSockets = {
     [10] = {
@@ -81,7 +77,7 @@ local buttonLayout =
 
 local scanningTooltip, enchantReplacementTable;
 local GetItemEnchantAsText, GetSocketTextures, ProcessEnchantText, CanEnchantSlot;
-if (isMop) then
+if (LingkanUI.Version.isMop) then
     buttonLayout[INVSLOT_RANGED] = "center";
     scanningTooltip = CreateFrame("GameTooltip", "BCPScanningTooltip", nil, "GameTooltipTemplate");
     scanningTooltip:SetOwner(UIParent, "ANCHOR_NONE");
@@ -448,7 +444,7 @@ local function positionCenter(button)
     additionalFrame.ilvlDisplay:SetPoint("BOTTOM", button, "TOP", 0, 7);
 
     local buttonId = button:GetID();
-    if (isMop) then
+    if (LingkanUI.Version.isMop) then
         if (buttonId == INVSLOT_MAINHAND) then
             additionalFrame.enchantDisplay:SetPoint("BOTTOMRIGHT", button, "BOTTOMLEFT", -5, 0);
 
@@ -553,7 +549,7 @@ local function UpdateAdditionalDisplay(button, unit)
             additionalFrame.enchantDisplay:SetTextScale(ILVL_ENCHANT_TEXT_SCALE);
         end
 
-        if (shouldDisplaySocketOverride) then
+        if (not LingkanUI.Version.isRemix) then
             local textures = (itemLink and LingkanUI.db.profile.betterCharacterPanel.showSockets) and GetSocketTextures(unit, slot) or {};
             for i = 1, NUM_SOCKET_TEXTURES do
                 local socketTexture = additionalFrame.socketDisplay[i];
@@ -582,25 +578,25 @@ local function UpdateAdditionalDisplay(button, unit)
         additionalFrame.prevItemLink = itemLink;
     end
 
-    local currentDurablity, maxDurability = LingkanUI.API:GetInventoryItemDurability(slot);
-    local percDurability = currentDurablity and currentDurablity / maxDurability;
+    local currentDurability, maxDurability = LingkanUI.API:GetInventoryItemDurability(slot);
+    local percentDurability = currentDurability and currentDurability / maxDurability;
 
-    if (not additionalFrame.prevDurability or additionalFrame.prevDurability ~= percDurability) then
-        if (LingkanUI.db.profile.betterCharacterPanel.showDurability and UnitIsUnit("player", unit) and percDurability and percDurability < 1) then
+    if (not additionalFrame.prevDurability or additionalFrame.prevDurability ~= percentDurability) then
+        if (LingkanUI.db.profile.betterCharacterPanel.showDurability and UnitIsUnit("player", unit) and percentDurability and percentDurability < 1) then
             additionalFrame.durabilityDisplay:Show();
-            additionalFrame.durabilityDisplay:SetValue(percDurability);
-            additionalFrame.durabilityDisplay:SetStatusBarColor(ColorGradientHP(percDurability));
+            additionalFrame.durabilityDisplay:SetValue(percentDurability);
+            additionalFrame.durabilityDisplay:SetStatusBarColor(ColorGradientHP(percentDurability));
         else
             additionalFrame.durabilityDisplay:Hide();
         end
-        additionalFrame.prevDurability = percDurability;
+        additionalFrame.prevDurability = percentDurability;
     end
 end
 
 local function CreateInspectIlvlDisplay()
     local parent = InspectPaperDollItemsFrame;
     if (not parent.ilvlDisplay) then
-        parent.ilvlDisplay = parent:CreateFontString(nil, "OVERLAY", isMop and "GameFontHighlightOutline" or "GameFontHighlightOutline22");
+        parent.ilvlDisplay = parent:CreateFontString(nil, "OVERLAY", LingkanUI.Version.isMop and "GameFontHighlightOutline" or "GameFontHighlightOutline22");
         parent.ilvlDisplay:SetPoint("TOPRIGHT", parent, "TOPRIGHT", 0, -20);
         parent.ilvlDisplay:SetPoint("BOTTOMLEFT", parent, "TOPRIGHT", -65, -83);
     end
@@ -644,7 +640,7 @@ local updateButton = function(button, unit)
         AnchorAdditionalDisplay(button);
     end
 
-    if (isMop) then
+    if (LingkanUI.Version.isMop) then
         C_Timer.After(0, function()
             UpdateAdditionalDisplay(button, unit);
         end);
@@ -749,7 +745,7 @@ function LingkanUI.BetterCharacterPanel:INSPECT_READY(inspecteeGUID)
 
     hooksecurefunc("InspectPaperDollFrame_SetLevel", function()
         CreateInspectIlvlDisplay();
-        if (not isMop) then
+        if (not LingkanUI.Version.isMop) then
             UpdateInspectIlvlDisplay(InspectFrame.unit);
         end
     end)

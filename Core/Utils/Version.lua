@@ -5,34 +5,41 @@ local build, buildText, buildDate, interface = GetBuildInfo()
 
 local versionUtil = {}
 
-function versionUtil:GetInterfaceVersion()
-    return interface
-end
+-- Properties (set during Init)
+versionUtil.interfaceVersion = interface
+versionUtil.build = build
+versionUtil.buildText = buildText
+versionUtil.buildDate = buildDate
+versionUtil.isRetail = false
+versionUtil.isClassicEra = false
+versionUtil.isMop = false
+versionUtil.isRemix = false
 
-function versionUtil:GetBuild()
-    return build, buildText, buildDate
-end
-
-function versionUtil:IsRetail()
-    return interface >= 110000
-end
-
-function versionUtil:IsClassicEra()
-    return interface < 40000
-end
-
-function versionUtil:IsMop()
-    return interface >= 50000 and interface < 60000
-end
-
--- Remix detection (buff spellID 1232454 present on player)
-local REMIX_SPELL_ID = 1232454
-function versionUtil:IsRemix()
+-- Remix detection (buff spellID 1213439 present on player)
+local REMIX_SPELL_ID = 1213439
+local function checkRemixStatus()
     if C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID then
         local aura = C_UnitAuras.GetPlayerAuraBySpellID(REMIX_SPELL_ID)
         return aura ~= nil
     end
     return false
+end
+
+function versionUtil:Init()
+    -- Initialize static version flags
+    self.isRetail = interface >= 110000
+    self.isClassicEra = interface < 40000
+    self.isMop = interface >= 50000 and interface < 60000
+    self.isRemix = checkRemixStatus()
+
+    -- print("LingkanUI Version Info: ")
+    -- print(" Build: " .. tostring(self.build) .. " (" .. tostring(self.buildText) .. ")")
+    -- print(" Build Date: " .. tostring(self.buildDate))
+    -- print(" Interface Version: " .. tostring(self.interfaceVersion))
+    -- print(" isRetail: " .. tostring(self.isRetail))
+    -- print(" isClassicEra: " .. tostring(self.isClassicEra))
+    -- print(" isMoP: " .. tostring(self.isMop))
+    -- print(" isRemix: " .. tostring(self.isRemix))
 end
 
 -- Optional convenience: expansion bucket by interface major (approximate)
