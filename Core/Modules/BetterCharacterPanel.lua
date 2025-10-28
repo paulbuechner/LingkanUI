@@ -10,13 +10,15 @@ local function DebugPrint(msg)
     LingkanUI:DebugPrint(msg, MODULE_NAME)
 end
 
-local isMop = LingkanUI.API.isMop
+local isMop = LingkanUI.Version:IsMop()
+local isRemix = LingkanUI.Version:IsRemix()
 
 local NUM_SOCKET_TEXTURES = 4;
 local ILVL_ENCHANT_TEXT_SCALE = 0.9;
 local INSPECT_ILVL_TEXT_SCALE = 0.63;
 
 local shouldDisplayEnchantMissingTextOverride = false
+local shouldDisplaySocketOverride = not isRemix
 
 local expansionRequiredSockets = {
     [10] = {
@@ -551,26 +553,28 @@ local function UpdateAdditionalDisplay(button, unit)
             additionalFrame.enchantDisplay:SetTextScale(ILVL_ENCHANT_TEXT_SCALE);
         end
 
-        local textures = (itemLink and LingkanUI.db.profile.betterCharacterPanel.showSockets) and GetSocketTextures(unit, slot) or {};
-        for i = 1, NUM_SOCKET_TEXTURES do
-            local socketTexture = additionalFrame.socketDisplay[i];
-            if (#textures >= i and LingkanUI.db.profile.betterCharacterPanel.showSockets) then
-                socketTexture:SetTexture(textures[i]);
-                socketTexture:SetVertexColor(1, 1, 1);
-                socketTexture:Show();
-            else
-                if LingkanUI.db.profile.betterCharacterPanel.showSockets then
-                    local expansion = LingkanUI.API:GetExpansionForLevel(UnitLevel(unit));
-                    local expansionSocketRequirement = expansion and expansionRequiredSockets[expansion];
-                    if (expansionSocketRequirement and expansionSocketRequirement[slot] and i <= expansionSocketRequirement[slot]) then
-                        socketTexture:SetTexture("Interface\\ItemSocketingFrame\\UI-EmptySocket-Red");
-                        socketTexture:SetVertexColor(1, 0, 0);
-                        socketTexture:Show();
+        if (shouldDisplaySocketOverride) then
+            local textures = (itemLink and LingkanUI.db.profile.betterCharacterPanel.showSockets) and GetSocketTextures(unit, slot) or {};
+            for i = 1, NUM_SOCKET_TEXTURES do
+                local socketTexture = additionalFrame.socketDisplay[i];
+                if (#textures >= i and LingkanUI.db.profile.betterCharacterPanel.showSockets) then
+                    socketTexture:SetTexture(textures[i]);
+                    socketTexture:SetVertexColor(1, 1, 1);
+                    socketTexture:Show();
+                else
+                    if LingkanUI.db.profile.betterCharacterPanel.showSockets then
+                        local expansion = LingkanUI.API:GetExpansionForLevel(UnitLevel(unit));
+                        local expansionSocketRequirement = expansion and expansionRequiredSockets[expansion];
+                        if (expansionSocketRequirement and expansionSocketRequirement[slot] and i <= expansionSocketRequirement[slot]) then
+                            socketTexture:SetTexture("Interface\\ItemSocketingFrame\\UI-EmptySocket-Red");
+                            socketTexture:SetVertexColor(1, 0, 0);
+                            socketTexture:Show();
+                        else
+                            socketTexture:Hide();
+                        end
                     else
                         socketTexture:Hide();
                     end
-                else
-                    socketTexture:Hide();
                 end
             end
         end
@@ -853,6 +857,7 @@ end
 
 function LingkanUI.BetterCharacterPanel:Load()
     DebugPrint("Loading module")
+
     bcpFrame = CreateFrame("Frame", ADDON_NAME .. "BCPEventFrame", UIParent)
     bcpFrame:RegisterEvent("INSPECT_READY")
     bcpFrame:RegisterEvent("SOCKET_INFO_UPDATE")
@@ -866,7 +871,9 @@ end
 
 function LingkanUI.BetterCharacterPanel:Unload()
     if not bcpFrame then return end
+
     DebugPrint("Unloading module")
+
     bcpFrame:UnregisterAllEvents()
     bcpFrame:SetScript("OnEvent", nil)
     bcpFrame:Hide()
