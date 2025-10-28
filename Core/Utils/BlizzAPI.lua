@@ -6,11 +6,6 @@ local ADDON_NAME, LingkanUI = ...
 LingkanUI.API = LingkanUI.API or {}
 local API = LingkanUI.API
 
--- Version flags
-API.buildNumber = select(4, GetBuildInfo())
-API.isRetail = API.buildNumber >= 100000
-API.isMop = API.buildNumber >= 50000 and API.buildNumber < 60000
-
 -- Safe item info wrappers (handle C_Item vs global fallbacks)
 function API:GetDetailedItemLevel(itemLink)
     if C_Item and C_Item.GetDetailedItemLevelInfo then
