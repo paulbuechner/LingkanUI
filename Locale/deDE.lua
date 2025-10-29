@@ -29,7 +29,6 @@ function LingkanUI:LangdeDE()
         ["LID_ENCH_DEFENDERS_MARCH"] = "Marsch des Verteidigers",
         ["LID_ENCH_STORMRIDERS_AGI"] = "Sturmreiter Beweglichkeit",
         ["LID_ENCH_COUNCILS_INTELLECT"] = "Intelligenz des Rates",
-        ["LID_ENCH_SUNSET_SPELLTHREAD"] = "+930 Intelligenz und +895 Ausdauer",
         ["LID_ENCH_CRYSTALLINE_RADIANCE"] = "Kristallines Strahlen",
         ["LID_ENCH_OATHSWORNS_STRENGTH"] = "Stärke des Eidgeschworenen",
         ["LID_ENCH_CHANT_ARMORED_AVOID"] = "Gesang der gerüsteten Vermeidung",
@@ -46,6 +45,7 @@ function LingkanUI:LangdeDE()
         ["LID_ENCH_INCANDESCENT_ESSENCE"] = "Inkandeszente Essenz",
         -- Weapon enchants
         ["LID_ENCH_AUTHORITY_OF_RADIANT_POWER"] = "Autorität der strahlenden Macht",
+        ["LID_ENCH_AUTHORITY_OF_THE_DEPTHS"] = "Autorität der Tiefen",
         -- Generic fragments (MoP / legacy tooltip parsing)
         ["LID_ENCH_RATING_UPPER"] = "Wertung",
         ["LID_ENCH_RATING_LOWER"] = "wertung",

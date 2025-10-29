@@ -35,7 +35,6 @@ function LingkanUI:LangenUS()
         ["LID_ENCH_DEFENDERS_MARCH"] = "Defender's March",
         ["LID_ENCH_STORMRIDERS_AGI"] = "Stormrider's Agi",
         ["LID_ENCH_COUNCILS_INTELLECT"] = "Council's Intellect",
-        ["LID_ENCH_SUNSET_SPELLTHREAD"] = "+930 Intellect and +895 Stamina",
         ["LID_ENCH_CRYSTALLINE_RADIANCE"] = "Crystalline Radiance",
         ["LID_ENCH_OATHSWORNS_STRENGTH"] = "Oathsworn's Strength",
         ["LID_ENCH_CHANT_ARMORED_AVOID"] = "Chant of Armored Avoid",
@@ -52,6 +51,7 @@ function LingkanUI:LangenUS()
         ["LID_ENCH_INCANDESCENT_ESSENCE"] = "Incandescent Essence",
         -- Weapon enchants
         ["LID_ENCH_AUTHORITY_OF_RADIANT_POWER"] = "Authority of Radiant Power",
+        ["LID_ENCH_AUTHORITY_OF_THE_DEPTHS"] = "Authority of the Depths",
         -- Generic fragments (MoP / legacy tooltip parsing)
         ["LID_ENCH_RATING_UPPER"] = "Rating",
         ["LID_ENCH_RATING_LOWER"] = "rating",

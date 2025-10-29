@@ -218,7 +218,6 @@ else
         [LingkanUI:GT("LID_ENCH_DEFENDERS_MARCH")]            = "Stam",
         [LingkanUI:GT("LID_ENCH_STORMRIDERS_AGI")]            = "Agi & Speed",
         [LingkanUI:GT("LID_ENCH_COUNCILS_INTELLECT")]         = "Int & Mana",
-        [LingkanUI:GT("LID_ENCH_SUNSET_SPELLTHREAD")]         = "Int & Stam",
         [LingkanUI:GT("LID_ENCH_CRYSTALLINE_RADIANCE")]       = "Primary Stat",
         [LingkanUI:GT("LID_ENCH_OATHSWORNS_STRENGTH")]        = "Str & Stam",
         [LingkanUI:GT("LID_ENCH_CHANT_ARMORED_AVOID")]        = "Avoid",
@@ -235,6 +234,7 @@ else
         [LingkanUI:GT("LID_ENCH_INCANDESCENT_ESSENCE")]       = "Essence",
         -- Weapon enchants
         [LingkanUI:GT("LID_ENCH_AUTHORITY_OF_RADIANT_POWER")] = "Radiant Power",
+        [LingkanUI:GT("LID_ENCH_AUTHORITY_OF_THE_DEPTHS")]    = "Depths",
         -- Misc
         ["+"]                                                 = "",
     };
@@ -311,6 +311,13 @@ local function escapePattern(text)
 end
 
 function ProcessEnchantText(enchantText)
+    -- Strip numbers and any trailing whitespace to prevent double spaces
+    enchantText = enchantText:gsub("%d+%s*", "")
+    -- Clean up any remaining multiple whitespaces
+    enchantText = enchantText:gsub("%s+", " ")
+    -- Trim leading/trailing whitespace
+    enchantText = enchantText:gsub("^%s*(.-)%s*$", "%1")
+
     -- Collect keys and sort by length descending for longest match first to avoid partial early replacements
     local keys = {}
     for k in pairs(enchantReplacementTable) do table.insert(keys, k) end
@@ -328,6 +335,7 @@ function ProcessEnchantText(enchantText)
         local pattern = escapePattern(seek)
         enchantText = enchantText:gsub(pattern, replacement)
     end
+
     return enchantText
 end
 
