@@ -64,7 +64,7 @@ function LingkanUI:SlashCommand(input)
         -- Open options panel
         if LingkanUI.Version.isRetail then
             -- Retail/Dragonflight and newer
-            Settings.OpenToCategory("LingkanUI")
+            Settings.OpenToCategory(LingkanUI.optionsFrame.name)
         else
             -- Classic versions - use AceConfigDialog directly
             LibStub("AceConfigDialog-3.0"):Open("LingkanUI")
