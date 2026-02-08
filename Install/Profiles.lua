@@ -157,6 +157,9 @@ function Install:ApplyAddonProfile(key, addonName)
     end
 
     if addonName == "BetterCooldownManager" then
+        if key ~= "Retail" then
+            return false, "BetterCooldownManager is only supported on Retail"
+        end
         local profileName = (pack.addons and pack.addons.BetterCooldownManager and pack.addons.BetterCooldownManager.profileName) or "LingkanUI"
         local profileData = NormalizeProfileData(pack.addons and pack.addons.BetterCooldownManager and pack.addons.BetterCooldownManager.profileData)
         local ok, err = self.Addons:ApplyBetterCooldownManagerProfile(profileName, profileData)
@@ -190,81 +193,88 @@ function Install:ApplyAddonProfile(key, addonName)
 end
 
 -- Shared external-addon scaffolds (NaowhUI-style "setup steps")
-local COMMON_STEPS = {
-    {
-        name = "ElvUI",
-        apply = function(_, pack)
-            if not LingkanUI.API:IsAddOnLoaded("ElvUI") then
-                return true
-            end
-            if not LingkanUI.API:IsAddOnEnabled("ElvUI") then
-                return true
-            end
-            local profileName = (pack.addons and pack.addons.ElvUI and pack.addons.ElvUI.profileName) or "LingkanUI"
-            local profileData = pack.addons and pack.addons.ElvUI and pack.addons.ElvUI.profileData
-            local ok = Install.Addons:ApplyElvUIProfile(profileName, profileData)
-            if ok == false then
-                -- If ElvUI isn't loaded, SavedVariables won't exist. Treat as skipped.
-                return true
-            end
+local STEP_ELVUI = {
+    name = "ElvUI",
+    apply = function(_, pack)
+        if not LingkanUI.API:IsAddOnLoaded("ElvUI") then
             return true
-        end,
-    },
-    {
-        name = "BetterCooldownManager",
-        apply = function(_, pack)
-            if not LingkanUI.API:IsAddOnLoaded("BetterCooldownManager") then
-                return true
-            end
-            if not LingkanUI.API:IsAddOnEnabled("BetterCooldownManager") then
-                return true
-            end
-            local profileName = (pack.addons and pack.addons.BetterCooldownManager and pack.addons.BetterCooldownManager.profileName) or "LingkanUI"
-            local profileData = pack.addons and pack.addons.BetterCooldownManager and pack.addons.BetterCooldownManager.profileData
-            local ok = Install.Addons:ApplyBetterCooldownManagerProfile(profileName, profileData)
-            if ok == false then
-                return true
-            end
+        end
+        if not LingkanUI.API:IsAddOnEnabled("ElvUI") then
             return true
-        end,
-    },
-    {
-        name = "BigWigs",
-        apply = function(_, pack)
-            if not LingkanUI.API:IsAddOnLoaded("BigWigs") then
-                return true
-            end
-            if not LingkanUI.API:IsAddOnEnabled("BigWigs") then
-                return true
-            end
-            local profileName = (pack.addons and pack.addons.BigWigs and pack.addons.BigWigs.profileName) or "LingkanUI"
-            local profileData = pack.addons and pack.addons.BigWigs and pack.addons.BigWigs.profileData
-            local ok = Install.Addons:ApplyBigWigsProfile(profileName, profileData)
-            if ok == false then
-                return true
-            end
+        end
+        local profileName = (pack.addons and pack.addons.ElvUI and pack.addons.ElvUI.profileName) or "LingkanUI"
+        local profileData = pack.addons and pack.addons.ElvUI and pack.addons.ElvUI.profileData
+        local ok = Install.Addons:ApplyElvUIProfile(profileName, profileData)
+        if ok == false then
+            -- If ElvUI isn't loaded, SavedVariables won't exist. Treat as skipped.
             return true
-        end,
-    },
-    {
-        name = "Details",
-        apply = function(_, pack)
-            if not LingkanUI.API:IsAddOnLoaded("Details") then
-                return true
-            end
-            if not LingkanUI.API:IsAddOnEnabled("Details") then
-                return true
-            end
-            local profileName = (pack.addons and pack.addons.Details and pack.addons.Details.profileName) or "LingkanUI"
-            local profileData = pack.addons and pack.addons.Details and pack.addons.Details.profileData
-            local ok = Install.Addons:ApplyDetailsProfile(profileName, profileData)
-            if ok == false then
-                return true
-            end
-            return true
-        end,
-    },
+        end
+        return true
+    end,
 }
+
+local STEP_BCM = {
+    name = "BetterCooldownManager",
+    apply = function(_, pack)
+        if pack.key ~= "Retail" then
+            return true
+        end
+        if not LingkanUI.API:IsAddOnLoaded("BetterCooldownManager") then
+            return true
+        end
+        if not LingkanUI.API:IsAddOnEnabled("BetterCooldownManager") then
+            return true
+        end
+        local profileName = (pack.addons and pack.addons.BetterCooldownManager and pack.addons.BetterCooldownManager.profileName) or "LingkanUI"
+        local profileData = pack.addons and pack.addons.BetterCooldownManager and pack.addons.BetterCooldownManager.profileData
+        local ok = Install.Addons:ApplyBetterCooldownManagerProfile(profileName, profileData)
+        if ok == false then
+            return true
+        end
+        return true
+    end,
+}
+
+local STEP_BIGWIGS = {
+    name = "BigWigs",
+    apply = function(_, pack)
+        if not LingkanUI.API:IsAddOnLoaded("BigWigs") then
+            return true
+        end
+        if not LingkanUI.API:IsAddOnEnabled("BigWigs") then
+            return true
+        end
+        local profileName = (pack.addons and pack.addons.BigWigs and pack.addons.BigWigs.profileName) or "LingkanUI"
+        local profileData = pack.addons and pack.addons.BigWigs and pack.addons.BigWigs.profileData
+        local ok = Install.Addons:ApplyBigWigsProfile(profileName, profileData)
+        if ok == false then
+            return true
+        end
+        return true
+    end,
+}
+
+local STEP_DETAILS = {
+    name = "Details",
+    apply = function(_, pack)
+        if not LingkanUI.API:IsAddOnLoaded("Details") then
+            return true
+        end
+        if not LingkanUI.API:IsAddOnEnabled("Details") then
+            return true
+        end
+        local profileName = (pack.addons and pack.addons.Details and pack.addons.Details.profileName) or "LingkanUI"
+        local profileData = pack.addons and pack.addons.Details and pack.addons.Details.profileData
+        local ok = Install.Addons:ApplyDetailsProfile(profileName, profileData)
+        if ok == false then
+            return true
+        end
+        return true
+    end,
+}
+
+local COMMON_STEPS = { STEP_ELVUI, STEP_BCM, STEP_BIGWIGS, STEP_DETAILS }
+local COMMON_STEPS_NO_BCM = { STEP_ELVUI, STEP_BIGWIGS, STEP_DETAILS }
 
 -- Packs (fill these with your LingkanUI settings + other addon profile code)
 Install:RegisterPack("Retail", {
@@ -315,10 +325,21 @@ Install:RegisterPack("Retail", {
 Install:RegisterPack("Mists", {
     name = "LingkanUI - Mists",
     overrides = {},
-    steps = COMMON_STEPS,
+    steps = COMMON_STEPS_NO_BCM,
     addons = {
-        ElvUI = { profileName = "LingkanUI", profileData = {} },
-        BetterCooldownManager = { profileName = "LingkanUI", profileData = {} },
+        ElvUI = {
+            profileName = "LingkanUI",
+            profileData = {
+                -- Profile
+                "!E1!T3vA7Pns26)q29v7s45ldyJxEABmxa3ltEAIlazqtesmsfEP)G)TFpNtvsQ0cciDY05MUF6zsSLQLZY7zPovvkt1Noz64fmoBgljf)z(QeFgh)Pv(blxXNoWqB64NIJ4th39zg(x(rSzH(tNnf)5x34Ne4hn3N6S)R8lJtwddW4H9hDE)bte99(T8WGi)PJV)Hj3EZG(kds5XoBs1TMo(LGf8vW8dea(M4O4eCsAUNWpK4VzlNXdIJMoPYWM4)SFsQ)LbHHt7vml2thNUk(LEBNbJyk(MS5uZfhr2Vdmh3pB4gh87(thy1PknuN7uMG2OJ8zZBkXb844qEWgH0NfYx1JrSCkWwBthgNgqC34lUzC3E32)ISrFal(LvKqYNTWp5YCAv3q9zznSuV2jhK1R6VJf(c7TuqJ8YiGkxJCYZbPbZccd4VH07841Zy87bEnjyb0ZZNm6wK82eYEZpzsahL2e(zPFKFclKapXC)1egCzs8l8vxeK4pxWVxF)OB(x3pys3BbzXg28GOLGud(zIjnDWr6)S1FR)ysqrIS5mqbnq7hSTRbuyB5XtsyZ)0OcetpXJ7oFU)g(nrpJQD8zp9julJVcAmliz64RE4MBbj)6GOG1msxjidDpVPJdJNtJ3LQA9G5XrerH0u0cHoDtU2S39tMC)DJU5QRNGu3AwajpE9(NEk1haroth)wXpdTyEiln9Awyyjg1vDmNC)WSbKy5LS1(35hTDCwRbADwmNhVEilYpe5XNzHB9NhhkSYsMEPLTHUHJUMthxhdBhTPpDQnywUC6LUAgD0T8m18SC19a0l8gtyaNEj8mnxBdptttlxBplXB4OGjMpkwqYraXusaLYFdOQXpTnme8dH6sgcLUbae3cwmOTcneldIw7NMYwsMEb5VM8kmFfmwDNndSXW3UiifHB3eLUbGr3e9uCP(uA(bOhlm)XfMoOZHRqqz1EkBIE(0C(kgaO4(j1MOrSe0QyMy0kyj5d6lOBAkktgka24z)B0u4z)ltarxxamEnyxDt0p6)wkpoIqQn3gCyxUniCrpw0Nq5uJca0MyXI4OZJxVHLWx7hXR6cLxXtg4DAy8l(jspuT4uoDBcAipoEB0cKqNVfO51xfg)IW1gP67sw6V)yVTaMe(B61OMHT8Hnq8j)rW)NmNfZazobUxItWyonqSBEEt62z)okCQ)YCzvdV7L4KWf7URGBMuE6APXNKT7vRzOr8S4fV1AJOXkJ(3zRicQnQHJ(tBDiay1NaFM5nSUSAhJ)CiG0I4xQfqvzmBu8d)y6AWIFf0IURbnph1DwKKjgdbIDPF4ZpC5hVmgaeNZs5GL)D47k5q8eSr3mKLaqYtuF(PwADoX0dSa7rUX6L3BW1xPEH)UrhdOhEqKBQrJyblEGlcxHT)2(xo5e1oqpWYZ7Ktn0lrOtyjl95TmtNQ3X(KtT1aVh92coTlAAD(j)HNc54a)Hz2uH0NUwrxjYPspfK4jNAIEEVJ9cnB98b7M7erMQoZnmTwedsYW0uHP3bk9nn1pXWgYm8wqltECuKjLeiiJPbHW(xacRRmfHJCoghppGfIHVkbqQjvuES1j6DCvfNBu1AT3t7oGYlZ525aUMbP)K0c)PRBNnvd95nHLBBcT9Cb2SJkXAyFy6EdnnPUJf1oj6yLn(ceCjC8bPnqRbtdiTH)3IeTomWTUlaZ0HSeur3hS4X4eitcyoeUBUgslDFWnhaq3vK5EVJZNcaupXWYOKQ4GjutbHkT(opecZPQsA18h(Fae6(sHWpSU66a91b92mO)K60AZiCcUnEvWt8U92RbH2jE6amtXN5hpe0jOiamxx4HSRP1s0GIyh29ooNaPpk0c30JT8iuHO1iqR4QVGuYokaUXjGueYaAwCvutd9bMildGeNeV5C4P(n6NOASbeBcc(j0sSlfWANIrDIFaVkOIQnQXfIcCR)t1562TTaw(Q7Qqh1icdBDmevPaHhJKfdvBPb8X54cxomPRPfG5gMe8mK3x3TjSd0xJiqkg9TFELjQoHTkrSapaiCx1z5Ejxy9oGVrurrlWnl2XE7hWMUDkpxnf9yNtPMGq727J6TpngzTZypTdDdPMeXbf(df3flL(485QL7WfOoRdRpWsk7GS0faUqKrrJomBaEacni3mmpRNHxmjge2TXyUwzuM5HaEKKLOh2TjP17yITSBcp4jyzJhNi7ulDWEs4r(owYNiSwxyDKX71(GmoYZOvGwpue3PiKdw3VA0rZd3WsgghlYdv7f)9pJG5HTiN4bdLe7H0hCE(j)vbZd9h7Z4hMJdOxGG1SISzVt3P5M(cTUtRnwQ2NikZ3XOYHmHX807wSQ72JZyIg6qIHLc9UpraKikSieDLCz3p)BQdomXOAsj(T(SN9pQLsy5IjRN7geAc)Tdgwz6zdHwCrjJFY(xiIbOFUWF2rUWmD7I86oWUrRMJwaDe0E(q2sr9LNXwsR9f(BzLtQSSAWV0I4KRsyVLwAj90lxfSWFYwECcSCOPdaf18vS8vFxu2koBwZfUv(I8s)UkifgS3e90exQL)IaEV4xlk1C3E3)t9)45x3flzjwQWjSzG9Bu6gKNN)gYu0ZVoB7cWON0t(zS62JKp1m7P9aB)fjXBG0vaf40XP0I7OfvCNO2EKGczvmxMjXlxkRnp19ZZkqjB6L2w6EMDS745OzA54LvgYKPd0WYuI)5m8p5LiXmkYXPsHWli6PdSCXD9aSDa2nDqCorpdlTZR3cI1uyiSXaWGqDSFiK4o6(98hg9t91lev5DKQGjB2mHYpXKQfx0kCvkxfgpJfEjmzIwbV2PLxVK(DSbYApojjy5sznv2K7shRroqTRyPz1HhlTkwzYuHVTXB8ddtjtM734tvahAmLCNOzIg0lo(tzVpa3dIuql5VGAsK0Oh)LOy(DSxVM22cr)ViHTmoAuWIcsrKJJOVNtBsGu)SmNj7gUzfdb3cjHr7ck998AR2FVD7V2BpJUw7V3DpDFpZEN9099GHAH1HgSnkG)eQ7XwXj1Y9r3fVn1)cSEF9k5tXs0EXgeklKS6UaodqfeGu4Af)X5yr)ukvUMYJYlIC(wCyOSfhqlzuYmdJdWgrUubKDsqCIO4rWSDsVqWYke8FDcc2792GHNFYqWiioIfEcMAI0n)j)8QaUp2qX(0KVPudmOT4R2En9Wq19yslBN4qEkNCnvixBX2E(XNK775hwlSboBqC3l)XZsbgH)Bv2AgYZhpBZwhlkb(v3E)pJTdcVJtMyVbjsbS2QTDrf7XOJQCSk1OqONAtbKOQVpbAdPMqz57pomBszCoB(k8TtIL1atTSYvyu69NblZAoe973kRclTzb)BysdE6TRZvMnVNJfSHz(MQPlGRYDkvhJrfjrT5n)uJ20hyZpJr7l0zGY)Tg1ic6cLpISHjiSqufi3SQj7Qa7kwkDMwGQXokOTcz(XnqQmD2GILBFGHYgLJX7HzAs81XHlWQSRl2WrHLzwZWWVFM2MQGD9k2M5sUXrBxdwsPeTvXuTWaTWOn3QKSvPAxtzsLzq(RqEA3)Zdk7MjbAkXAtkPVLBo18Tv9b1KBKY(aWKDvDcPq55KAUxfIzuDTC(5z)0fqKyiyjsQQoC2G7q1lOiKlkTeJFJK(v5lioo(lIGJ0oF17pkquxRos08ZcjswG7gkAw(GIuG8(VMfBUhZm6WvDI0v7wEFYnlmuml2bYotj6i64xRGb8SWWvaXvcAPPmZ6wwkZnwoYsSGi)6gngFaIMRgcndiRUrUL47naHdMFeXHRacYGeXmjXYJpbyjP1oiNHfRP6MflJ3aXA69WLxogpAdbZ)0KvjXBxUsKjtdsCJAb5keOzHwReNtOgGiDIGv1J1jtCTysQPkfeYzZXTZEhH76fS89hhehVi0)9hNeesjHRe9tOrAo4xHHy2XjPCKpC7SYSJk8h71OTZAyzCBx)BV)4hwe80tbZ3gYFJozh4JiqiDescGxrQVDLFsUPvvtOCdipvBnRws(qVKzNvtrJYD(icb8l5tg1IFvrAxG5RMSygXRc7Xj69hlq77m)rvV45E9JIJY(5AgJ6fwjDoYKhkobjvkaa6bTlbnflYAFUS35aPcCA0fnxer1OIdNQzhOxLTrqxUksiTl5VTS6YQcCTK6sPqqY(9lkPAuXzGksjBj7TfVUKMJ67qvqEPIRiotvv9pXRKI(G7LhnUWHjGj28SZAO6aLjQTCWI5KWbtSWXzRNafpQzXu4)RiEtH3rfhm4adC6VdmF1Htr1vQCgs3iU0XhC(NeQwzXtwsY3zYLzVPSy5vfvWBfQrEL1zug8vysIneYg8kqTTjLwEsT1yHGMpIl0Aj2OEG6B0932x1x)U8JyLHAhfh6Ft25Q7nLyXneTxAj0rBhPAfJ7tKmqwMpNJWCW5Z1C4uu5SJSoAcVM5RzhjQozBcp0NC3DsfGVQrdVH4iv9ClcJKN71zCSIFHbTK7cL)DrcmzoF0uIAT7avnfapFbou(hy0QuE5KheZwkb0Qy2IG6AzsvlzJVSz7ZBXZqP1IHNwKgCROe8OGhZ6tNCrQNMQZDmb2GONIfNIZjtvpa18gs82OCbbAsNaoclRNLfCG3qQ2EL5WwnKAvAlkjzVQIxPQKEzfTzLqXEnL6QRGOBm1v5bpK2s6C5PTE9iN1s)uRL0pZ958zNi8LJ6ExFSDJ8tZ7)UdAwmel8FIbj6jkq(SsQRf(4OFzs8AQCVi73c3KcIloRB0I8dxlvOqXVj8VxWW4z8V)OSPWFHS(5gEAnWELRRKI9aVzlIY5WFR)mF1OM7kZ9646DN6U5HM6ERfUAx5U3OjTk6QAYE55PzjENCNzSYZABCiJtB7cPGvtAPbDCD3icVcQPH3Qhcd3gX2BEEtdXORHjYZWuVIP7(dP(9ygMnxLNVFs785GxXZUFrANfJyXvzOJs2OLce9QI2Sbix50lpWeavRsud15)JcKvLCqtKJlHzzRzl9R6nTCm9dkJvLmqvsn26))K65Hzy0CgOfPTY)QK6PipWglEMQQAFjVOOJuxU8x1Ax2G6hPu8iqC0(mDlVYTDx0eKbAWhPa)0IhXSlRJYfWQsX6RGCYJdukhSIGLkzJHx9N7Z)vU4UXiskSPu9L(sPnRMCLoRj)RIyKLtI4demOivGj7nDIQjiLLnrB77v)x3K4NM(cWnhzoeZY9GszfrCmKyIeewMufb6lvj66Grv6tV69r8ZS0KY9CrDZLQfZHEyXTcC8h(NOxBNt8Ff8uK(BF4FsOCDigA(tWtuctpRfV)iEgq(hiqy)rVunilSunllmrh8GLX197ElMYAYoCuul6sdHg1p44mOLXhZ2kHvSu)BIwGLDvuig5T3tx21dQyineEunOvnGK2UcKjp)izhQmubxFBMBzHcL3IAKm8zlEdYLD(NYigbjG(rBi9qIrXZdx3b)i00TRxhhDtfLS4mXxywkhqxfp20wmnFlNHMBtufCcrbDRZWZYdGSfBfgTjPH(rl5R65d8JpDYiOhZRfO)i7oFx7OuZBaPwPil0PK6adSQUMzvKP5ocSKhjRrNi1JTU7TcrD2O0B2855Bg6jzYJ96GwLETOe1wvLHLwMjS5rhb97XvD04cj(ZEPchDfQvZw81D5dgB4bxH6VelH4pyzS3xzP31AdBFHGhbE)R3Qh2lyULAvVZIEZ)AS6b(u5xxb6INFNFyyGefMwelH0eKkHsMu8WzfhTtHQAKFA8wiNqP0F9Sys4G)6aQeiZKhm1lDT88mn9m0m7yPBBAuCWvr0(aJsn2XZ2W20UJMPJMJNRU8A4N1yZYn202tdcJOzAA5y7shjw78gtSlG1amFeaIHqBtuoUSK92Log6oUMWCzA4Aa)mocu0woBZMSEi)2aOHZLBh4)k(2aSJ3mBxVHNjvLflRKyf1dsP9B03NarXSWh8X8goP5J8BLM9XfqYjsQ3XfeooEEGy1wxRJ8RuqE)H37P71rh0p2oDC8izGtPudg29MbYbt8XqW1X20PthqTMpyx62XZWZwxxZYqt3Zqxru4Pz6z2XrZWgAHPwUO4Yhg9R7DC90SnT6akAldZoGQ(qg37p)HXzCVzhaDa8oOLT190uiyxxTo6UAAwAD0mC1uhyxllpltyGbyLrXa3Fq)rxTFs2bgsDdDGM0D7aWzLVye6DSCbiUMLPUPPRLaXMx(0Zv(Gu4cTe4lx6CFBKB2adVTEhdtpBaHbqxnl9IH310Yvdm3a5IJRUDbCMQPD2xHG14bFft7i7bk(BLeYG4BW75xY2n8me3pyz2XagtphdxlBDbaQ2dN1WdB0loBwACYmrIJGeZbeJgUGM2sZvE42TKoSOJBUOxcNfOUZXbWeA2GguRdGAvebgWtDaLkieC98CvLWKLhHQvT7kcGbsDBnphqGBPz446Aa9u4sz5oFZSD9g5gf20smFQ8guIFrI4zlzV0PAtCY6PN3pKNSniD9fqJPdJg5NDmvyckmofEGsFL2gA6KHrL9H2pn18yMbP5e6JHXJwicYMFfsXrpF31k6X6GflWuQWve8(JuQ4lAACYisALdscS1jwEptYNYzXq(tYvULDbpvPjCelUiCeZp(TuU)Asei3gQ8LCkVycvUahjucHJXf18e93zCxHkt5GLWiSNmXKS7Yq1SnW9OUYrYzgDRGYVNio4vPyEsC5uuYFuogz81DH1qNJuA6eTdzEY)K)BT1nI(quYWkRWvL2sHurgHjBa4Mp57VbjRr4IOOWo5ZX0XN((JtIFnapVQk57O8u54jee58uZDCxKm1TMi5SHxi1m6OsBkF3NONH9xTkG5dQ6dlvNgyXCcuzwfyE)rrnyOUsFVpkD)i(wrZxx4UB1DnLBf9Vt761cb)xEvRQu(aW1FX1YnaLQ61UcjKDvv(BGWFbacz35QVlu2T67wbc8FzL9g2sS4jafF39yLr)WS4iAbQNPdkjDqdv8ed4jgLEIj8eZ)bLI5Hdj2DaKwyi0Vq4BXBL9HUJjYB923fWJ)2xW(9fq3HX9RABunDS6J9MquB2SFXLj1thsCJm)BHbjmg6ZBWrao5TlG0li3SIiRRsWdRVrf73GyFz)lx7R6mEublKmNrXqvQhTBNwBmly2FPOM1nPZo1OUPzNkl(OcyqCnDuwsT10IRY8F71(VaETB4Q2p(zX94V)RbC53UJdYSQbS3ouIYT6Ptr5eu1ezxu)9d2(lHRt7VBSfBkTY)SSgl5v8qX2Fv1ZgFlPN)mdD(nS73MaFflT6I(WIRU(bXPx)dshGBdWfyzSVvpL5t)paAOzdmbUW5BjCXXy)xx3xdEOCMA(Zhx0ANlh4(lOJGMdlddvct8zWUPqWneGD)rLRaT45L9NySuot81rSyNnw0sHUlPymRH(AovuMifd67nF(MSHtEdEJRLD)HZSvve1bInIYRIo5ki8sdN8RPZ3k2KFL8vB9TGnzt(QhD)vp0)BjV0CXrrzdEBCe3gnLZqc7HBE289hfY8IJsYxODTDGMSR74OEmBxVHlt()L8TuN2zA8JDnTV1q7e7QTr2MdhYwVzs845j(Ip)xL)h5d)i)10pi)hUdLpSue)E5OB6p4IB)1po82U)keKDsXX3PYgkw(8sv0GRI5RyRhWWda0PpecUVMkpdlt6o6Q(tits8K3u7O9BK9rf7f5jFJohH0(UNtwdgEUOlh1KVdEGtNeI7Yh1Mo3HtvVKz0fbH(W2s7iT8FjtuVAbMepOCfYuw0UP4cHjA6VkoUwkNoRoIxxyMjWInWy9WpAqI)LPqEbZYouT4hapL7GljDkgW7h0RlK3u5V8qELU0ADklTA8A)wUoeLoA6kStzmI6LZqvLPoonFV)E)X)N3FS(X3VD9Dy(LG8qP1CSqbW)aGdseG23hsTDcB)SHA7e8wc3)zQWiAE9DKhfL)jjAj45t(HuKtNv2uIIm)b82TM)pIiCXNZwHYL(CFon77QG4mnNwzyLhQ51(C43X2LF)MroFBc8UZVjJQu)NGd1tbkJ8DmbdolrwnC8BnlH3kDSBXBmD18zYsaiVSJNM1O8qNgwnfOxzhHA5exB1o10c9)hGGW)B6zNTjj(PGq)Zo7cX1K()7p",
+                -- Private
+                "!E1!1vvxVXXnmWFrTag(PM3QDtkcGtI7DoVUfCL4TlTLe3sP9CS)1xsQ9(iOOpDsALihoZqEd3m80W(jSGcKSLnUH5Nei8ckdJd7lqgxsqdFaKj8tCPnS)3pc2pHzOD364ycRd7Juf0vX(loC99YuHYWIf9zkIEWPY0WD993djSeblB)uqTCTNEhh(6n3mSpXCZWZRSKIFrJ21y7)bw)0XhzkGF7ikj4n7XX8uhL)j3MH8xbr4x)LVNAcy44CSRgUXIvCDeoct)NZQAb5hoMO3FhKOFHJyP9apzzJQjOeRpcs7Th5Q9S9lyBeATeUs22rQenAz8sXYA4AOSM9quQlyWpFALsX7GYl2grzBvA8qKHzNKq8L0B7WxvKuTd(NvS2EIYO4BBRnwii5BkCrakAlbrlkpxQj4Zfn1qOrCXocltcCCdG11XAqOf7J(9QnQPb0jweAZ7WqxJC2s)na5Lkz05j8hu2xy)jbwPkvL2Hf(1shjn6a0RwvrIOYWj)UQO8gk3pBYP)vZ(43BCk3ZPBNPGA0i)d4pwGsvH6dWzkoiWb)JqyMuLkVfeLIuduFnylroXtUJbIMGUk4M9lduQN3AGfhm12MNOZ4xqz6W0wPqLEJvehx7NbJMHz8Kj5VwXv8Ki89LjR69QisQQzRyjIYm05dVHyRWv4AkwpbyjWRM28mVkLU2aVRetd7CUs)046j9DbLxCXPYRjZlwV6b7qZ71FwkHUPORKABdv7rimlCMqZM1RRFqDAkiShyLZxwoBXR1RCaA4tPrM7o61YfpT7j3HtuvjpVWu6ASxIvwht16WQ7G2dLqR3V4Mm56hg4CETOg1UlC5y3Tii22qvVF8aHP45qSrSLc27xYWZS8j4cha24T)G0rl1nUuLgcJ7Gqpr84ZgLDeVAUkS6byMxppmGojfZyA5kY)J1QQL(T06PwvSkm71yM0PwYLgB315fY2COVTCgMAJIn2DgH41m2JcEKWx9YnFVo70xnUnCr9TN4aDr3iQnCs7GOdi7X9Kb9Gq4MTjCzM((MIUmuGjCte4uu7Y)YLJMuVa5vSAWNMHA7bTJm9iDIS0uuQzEsOdEN428QM19I3(XRgeRdj16m93QuVKWM9Nh3(R)2T6Ng(Whwe6Oor)F)",
+                -- Global
+                "!E1!fkzupnommC8VrNyWHeWBBLnyASUjsq8wKCB8AJoNKQ0uo4(0JDMoTjTh4P(p2o)ZpBxZmJ2OSqgY4N5r5q70yo63dbKkNxs50KB0)ixKMlsIfapEkJr1JUU(SP(6B4Ct(9rxGnR(EJQbA)JnfhmnSoMSysu)1zZ9M6z3D3TM8jJ0o2w2(dXWrwWa0qOzXXqg1gNVbte(1Xak3)qXLJN2nLjxG5s)86Qn7Et)Y66LI9hsmUVGFGet4LWFgWZ(jGV(k2q2YrmNDHUcKRsomylYENfxOMpiel65dNKR2WsPz)CaLB0wAvzSVkM8aNz)YxRwwRLIEkswjDh)TIHBKHGd)4ucACKl)LKK9Pv3NWXEP66FlSPQI(gOSKKP5QjIkxTqDhgWeqsYrpqeMEpMi7wO0ThalYs5nYUyWuF1V45X)ROkYddxG)p58ndFTH4ORuVAXoTE32xx)0ZLEWddZPHE49EmSn(bpUelV52lECvlqYESaP5Hh6OydqF)",
+                -- Aura
+                "!E1!lodJlK4kjU4SYQ0YmNssTOIb8d",
+            }
+        },
         BigWigs = { profileName = "LingkanUI", profileData = {} },
         Details = { profileName = "LingkanUI", profileData = {} },
     },
@@ -327,10 +348,9 @@ Install:RegisterPack("Mists", {
 Install:RegisterPack("Wrath", {
     name = "LingkanUI - Wrath",
     overrides = {},
-    steps = COMMON_STEPS,
+    steps = COMMON_STEPS_NO_BCM,
     addons = {
         ElvUI = { profileName = "LingkanUI", profileData = {} },
-        BetterCooldownManager = { profileName = "LingkanUI", profileData = {} },
         BigWigs = { profileName = "LingkanUI", profileData = {} },
         Details = { profileName = "LingkanUI", profileData = {} },
     },
@@ -339,10 +359,9 @@ Install:RegisterPack("Wrath", {
 Install:RegisterPack("TBC", {
     name = "LingkanUI - TBC",
     overrides = {},
-    steps = COMMON_STEPS,
+    steps = COMMON_STEPS_NO_BCM,
     addons = {
         ElvUI = { profileName = "LingkanUI", profileData = {} },
-        BetterCooldownManager = { profileName = "LingkanUI", profileData = {} },
         BigWigs = { profileName = "LingkanUI", profileData = {} },
         Details = { profileName = "LingkanUI", profileData = {} },
     },
@@ -351,10 +370,9 @@ Install:RegisterPack("TBC", {
 Install:RegisterPack("ClassicEra", {
     name = "LingkanUI - Classic Era",
     overrides = {},
-    steps = COMMON_STEPS,
+    steps = COMMON_STEPS_NO_BCM,
     addons = {
         ElvUI = { profileName = "LingkanUI", profileData = {} },
-        BetterCooldownManager = { profileName = "LingkanUI", profileData = {} },
         BigWigs = { profileName = "LingkanUI", profileData = {} },
         Details = { profileName = "LingkanUI", profileData = {} },
     },

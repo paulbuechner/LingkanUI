@@ -61,16 +61,18 @@ Core\Modules\TabTargetArenaFix.lua
 
 Core\Options\Options.lua
 
-## Installer ##
-Install\Addons.lua
-Install\AddOns\ElvUI.lua
-Install\AddOns\BigWigs.lua
-Install\AddOns\BetterCooldownManager.lua
-Install\AddOns\Details.lua
-Install\Profiles.lua
-Install\Installer.lua
-
 LingkanUI.lua
+
+## Installer ##
+Install\Game\Shared\!load.xml
+Install\Data\Standard\!load.xml
+Install\Data\Mists\!load.xml
+Install\Data\TBC\!load.xml
+Install\Data\Vanilla\!load.xml
+Install\Game\Standard\Modules\Installer\Installer.lua
+Install\Game\Mists\Modules\Installer\Installer.lua
+Install\Game\TBC\Modules\Installer\Installer.lua
+Install\Game\Vanilla\Modules\Installer\Installer.lua
 ##
 Core\Media\Load_Media.xml
 
