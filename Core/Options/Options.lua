@@ -54,6 +54,52 @@ LingkanUI.defaults = {
             showDurability = true,
             showSockets = true,
         },
+        interface = {
+            healthPercent = {
+                enabled = false,
+                font = "Fonts\\FRIZQT__.TTF",
+                fontsize = 12,
+                outline = "OUTLINE",
+                anchorFrom = "TOPLEFT",
+                anchorTo = "TOPLEFT",
+                offsetX = 0,
+                offsetY = 0,
+                debug = false,
+            },
+            healthAbsolute = {
+                enabled = false,
+                font = "Fonts\\FRIZQT__.TTF",
+                fontsize = 12,
+                outline = "OUTLINE",
+                anchorFrom = "RIGHT",
+                anchorTo = "RIGHT",
+                offsetX = 0,
+                offsetY = 0,
+                debug = false,
+            },
+            targetPercent = {
+                enabled = false,
+                font = "Fonts\\FRIZQT__.TTF",
+                fontsize = 12,
+                outline = "OUTLINE",
+                anchorFrom = "RIGHT",
+                anchorTo = "RIGHT",
+                offsetX = 0,
+                offsetY = 0,
+                debug = false,
+            },
+            targetAbsolute = {
+                enabled = false,
+                font = "Fonts\\FRIZQT__.TTF",
+                fontsize = 12,
+                outline = "OUTLINE",
+                anchorFrom = "LEFT",
+                anchorTo = "LEFT",
+                offsetX = 0,
+                offsetY = 0,
+                debug = false,
+            },
+        },
     }
 }
 
@@ -259,7 +305,7 @@ LingkanUI.options = {
             name = "Modules",
             type = "group",
             order = 2,
-            childGroups = "tab",
+            childGroups = "tree",
             args = {
                 lean = {
                     name = "Leaning",
@@ -617,6 +663,535 @@ LingkanUI.options = {
                             }
                         },
                     }
+                },
+                interface = {
+                    name = "Interface",
+                    type = "group",
+                    order = 6,
+                    childGroups = "tab",
+                    args = {
+                        individualUnits = {
+                            name = "Individuelle Einheiten",
+                            type = "group",
+                            order = 1,
+                            childGroups = "tab",
+                            args = {
+                                header = {
+                                    name = "Interface Settings",
+                                    type = "header",
+                                    order = 0,
+                                },
+                                player = {
+                                    name = "Player",
+                                    type = "group",
+                                    order = 1,
+                                    childGroups = "tree",
+                                    args = {
+                                        life = {
+                                            name = "Leben",
+                                            type = "group",
+                                            order = 1,
+                                            inline = true,
+                                            args = {
+                                                enabled = {
+                                                    name = "Enable",
+                                                    desc = "Show current player health as an absolute number anchored to the right side of the health bar",
+                                                    type = "toggle",
+                                                    order = 1,
+                                                    get = function() return LingkanUI.db.profile.interface.healthAbsolute.enabled end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthAbsolute.enabled = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                font = {
+                                                    name = "Font",
+                                                    desc = "Choose a font for the absolute health text",
+                                                    type = "select",
+                                                    dialogControl = "LSM30_Font",
+                                                    values = function()
+                                                        local ok, LSM = pcall(function() return LibStub("LibSharedMedia-3.0") end)
+                                                        if not ok or not LSM then return {} end
+                                                        local list = LSM:List(LSM.MediaType and LSM.MediaType.FONT or "font") or {}
+                                                        local out = {}
+                                                        for _, name in ipairs(list) do out[name] = name end
+                                                        return out
+                                                    end,
+                                                    order = 2,
+                                                    get = function() return LingkanUI.db.profile.interface.healthAbsolute.font end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthAbsolute.font = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                outline = {
+                                                    name = "Font Outline",
+                                                    desc = "Outline style for the font",
+                                                    type = "select",
+                                                    values = {
+                                                        NONE = "None",
+                                                        OUTLINE = "Outline",
+                                                        THINOUTLINE = "Thin Outline",
+                                                        MONOCHROME = "Monochrome",
+                                                        MONOCHROMEOUTLINE = "Monochrome Outline",
+                                                    },
+                                                    order = 2.1,
+                                                    get = function() return LingkanUI.db.profile.interface.healthAbsolute.outline end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthAbsolute.outline = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                fontsize = {
+                                                    name = "Font Size",
+                                                    desc = "Font size for the absolute health text",
+                                                    type = "range",
+                                                    min = 6,
+                                                    max = 36,
+                                                    step = 1,
+                                                    order = 3,
+                                                    get = function() return LingkanUI.db.profile.interface.healthAbsolute.fontsize end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthAbsolute.fontsize = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                anchorFrom = {
+                                                    name = "Anchor From",
+                                                    desc = "Anchor point on the text",
+                                                    type = "select",
+                                                    values = { TOPLEFT = "TOPLEFT", TOP = "TOP", TOPRIGHT = "TOPRIGHT", LEFT = "LEFT", CENTER = "CENTER", RIGHT = "RIGHT", BOTTOMLEFT = "BOTTOMLEFT", BOTTOM = "BOTTOM", BOTTOMRIGHT = "BOTTOMRIGHT" },
+                                                    order = 4,
+                                                    get = function() return LingkanUI.db.profile.interface.healthAbsolute.anchorFrom end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthAbsolute.anchorFrom = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                anchorTo = {
+                                                    name = "Anchor To",
+                                                    desc = "Anchor point on the health bar",
+                                                    type = "select",
+                                                    values = { TOPLEFT = "TOPLEFT", TOP = "TOP", TOPRIGHT = "TOPRIGHT", LEFT = "LEFT", CENTER = "CENTER", RIGHT = "RIGHT", BOTTOMLEFT = "BOTTOMLEFT", BOTTOM = "BOTTOM", BOTTOMRIGHT = "BOTTOMRIGHT" },
+                                                    order = 4.1,
+                                                    get = function() return LingkanUI.db.profile.interface.healthAbsolute.anchorTo end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthAbsolute.anchorTo = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                offsetX = {
+                                                    name = "Offset X",
+                                                    desc = "Horizontal offset from the anchor point",
+                                                    type = "range",
+                                                    min = -200,
+                                                    max = 200,
+                                                    step = 1,
+                                                    order = 5,
+                                                    get = function() return LingkanUI.db.profile.interface.healthAbsolute.offsetX end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthAbsolute.offsetX = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                offsetY = {
+                                                    name = "Offset Y",
+                                                    desc = "Vertical offset from the anchor point",
+                                                    type = "range",
+                                                    min = -200,
+                                                    max = 200,
+                                                    step = 1,
+                                                    order = 6,
+                                                    get = function() return LingkanUI.db.profile.interface.healthAbsolute.offsetY end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthAbsolute.offsetY = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                            },
+                                        },
+                                        lifePercent = {
+                                            name = "Leben Prozent",
+                                            type = "group",
+                                            order = 2,
+                                            inline = true,
+                                            args = {
+                                                enabled = {
+                                                    name = "Enable",
+                                                    desc = "Show a small player health percentage anchored to the player health bar",
+                                                    type = "toggle",
+                                                    order = 1,
+                                                    get = function() return LingkanUI.db.profile.interface.healthPercent.enabled end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthPercent.enabled = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                font = {
+                                                    name = "Font",
+                                                    desc = "Choose a font for the health percent text",
+                                                    type = "select",
+                                                    dialogControl = "LSM30_Font",
+                                                    values = function()
+                                                        local ok, LSM = pcall(function() return LibStub("LibSharedMedia-3.0") end)
+                                                        if not ok or not LSM then return {} end
+                                                        local list = LSM:List(LSM.MediaType and LSM.MediaType.FONT or "font") or {}
+                                                        local out = {}
+                                                        for _, name in ipairs(list) do out[name] = name end
+                                                        return out
+                                                    end,
+                                                    order = 2,
+                                                    get = function() return LingkanUI.db.profile.interface.healthPercent.font end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthPercent.font = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                outline = {
+                                                    name = "Font Outline",
+                                                    desc = "Outline style for the font",
+                                                    type = "select",
+                                                    values = {
+                                                        NONE = "None",
+                                                        OUTLINE = "Outline",
+                                                        THINOUTLINE = "Thin Outline",
+                                                        MONOCHROME = "Monochrome",
+                                                        MONOCHROMEOUTLINE = "Monochrome Outline",
+                                                    },
+                                                    order = 2.1,
+                                                    get = function() return LingkanUI.db.profile.interface.healthPercent.outline end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthPercent.outline = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                fontsize = {
+                                                    name = "Font Size",
+                                                    desc = "Font size for the health percent text",
+                                                    type = "range",
+                                                    min = 6,
+                                                    max = 36,
+                                                    step = 1,
+                                                    order = 3,
+                                                    get = function() return LingkanUI.db.profile.interface.healthPercent.fontsize end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthPercent.fontsize = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                anchorFrom = {
+                                                    name = "Anchor From",
+                                                    desc = "Anchor point on the text",
+                                                    type = "select",
+                                                    values = { TOPLEFT = "TOPLEFT", TOP = "TOP", TOPRIGHT = "TOPRIGHT", LEFT = "LEFT", CENTER = "CENTER", RIGHT = "RIGHT", BOTTOMLEFT = "BOTTOMLEFT", BOTTOM = "BOTTOM", BOTTOMRIGHT = "BOTTOMRIGHT" },
+                                                    order = 4,
+                                                    get = function() return LingkanUI.db.profile.interface.healthPercent.anchorFrom end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthPercent.anchorFrom = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                anchorTo = {
+                                                    name = "Anchor To",
+                                                    desc = "Anchor point on the health bar",
+                                                    type = "select",
+                                                    values = { TOPLEFT = "TOPLEFT", TOP = "TOP", TOPRIGHT = "TOPRIGHT", LEFT = "LEFT", CENTER = "CENTER", RIGHT = "RIGHT", BOTTOMLEFT = "BOTTOMLEFT", BOTTOM = "BOTTOM", BOTTOMRIGHT = "BOTTOMRIGHT" },
+                                                    order = 4.1,
+                                                    get = function() return LingkanUI.db.profile.interface.healthPercent.anchorTo end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthPercent.anchorTo = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                offsetX = {
+                                                    name = "Offset X",
+                                                    desc = "Horizontal offset from the anchor point",
+                                                    type = "range",
+                                                    min = -200,
+                                                    max = 200,
+                                                    step = 1,
+                                                    order = 5,
+                                                    get = function() return LingkanUI.db.profile.interface.healthPercent.offsetX end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthPercent.offsetX = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                offsetY = {
+                                                    name = "Offset Y",
+                                                    desc = "Vertical offset from the anchor point",
+                                                    type = "range",
+                                                    min = -200,
+                                                    max = 200,
+                                                    step = 1,
+                                                    order = 6,
+                                                    get = function() return LingkanUI.db.profile.interface.healthPercent.offsetY end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.healthPercent.offsetY = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                                target = {
+                                    name = "Ziel",
+                                    type = "group",
+                                    order = 2,
+                                    childGroups = "tree",
+                                    args = {
+                                        life = {
+                                            name = "Leben",
+                                            type = "group",
+                                            order = 1,
+                                            inline = true,
+                                            args = {
+                                                enabled = {
+                                                    name = "Enable",
+                                                    desc = "Show current target health as an absolute number anchored to the left side of the target health bar",
+                                                    type = "toggle",
+                                                    order = 1,
+                                                    get = function() return LingkanUI.db.profile.interface.targetAbsolute.enabled end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetAbsolute.enabled = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                font = {
+                                                    name = "Font",
+                                                    desc = "Choose a font for the absolute target health text",
+                                                    type = "select",
+                                                    dialogControl = "LSM30_Font",
+                                                    values = function()
+                                                        local ok, LSM = pcall(function() return LibStub("LibSharedMedia-3.0") end)
+                                                        if not ok or not LSM then return {} end
+                                                        local list = LSM:List(LSM.MediaType and LSM.MediaType.FONT or "font") or {}
+                                                        local out = {}
+                                                        for _, name in ipairs(list) do out[name] = name end
+                                                        return out
+                                                    end,
+                                                    order = 2,
+                                                    get = function() return LingkanUI.db.profile.interface.targetAbsolute.font end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetAbsolute.font = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                outline = {
+                                                    name = "Font Outline",
+                                                    desc = "Outline style for the font",
+                                                    type = "select",
+                                                    values = {
+                                                        NONE = "None",
+                                                        OUTLINE = "Outline",
+                                                        THINOUTLINE = "Thin Outline",
+                                                        MONOCHROME = "Monochrome",
+                                                        MONOCHROMEOUTLINE = "Monochrome Outline",
+                                                    },
+                                                    order = 2.1,
+                                                    get = function() return LingkanUI.db.profile.interface.targetAbsolute.outline end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetAbsolute.outline = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                fontsize = {
+                                                    name = "Font Size",
+                                                    desc = "Font size for the absolute target health text",
+                                                    type = "range",
+                                                    min = 6,
+                                                    max = 36,
+                                                    step = 1,
+                                                    order = 3,
+                                                    get = function() return LingkanUI.db.profile.interface.targetAbsolute.fontsize end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetAbsolute.fontsize = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                anchorFrom = {
+                                                    name = "Anchor From",
+                                                    desc = "Anchor point on the text",
+                                                    type = "select",
+                                                    values = { TOPLEFT = "TOPLEFT", TOP = "TOP", TOPRIGHT = "TOPRIGHT", LEFT = "LEFT", CENTER = "CENTER", RIGHT = "RIGHT", BOTTOMLEFT = "BOTTOMLEFT", BOTTOM = "BOTTOM", BOTTOMRIGHT = "BOTTOMRIGHT" },
+                                                    order = 4,
+                                                    get = function() return LingkanUI.db.profile.interface.targetAbsolute.anchorFrom end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetAbsolute.anchorFrom = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                anchorTo = {
+                                                    name = "Anchor To",
+                                                    desc = "Anchor point on the health bar",
+                                                    type = "select",
+                                                    values = { TOPLEFT = "TOPLEFT", TOP = "TOP", TOPRIGHT = "TOPRIGHT", LEFT = "LEFT", CENTER = "CENTER", RIGHT = "RIGHT", BOTTOMLEFT = "BOTTOMLEFT", BOTTOM = "BOTTOM", BOTTOMRIGHT = "BOTTOMRIGHT" },
+                                                    order = 4.1,
+                                                    get = function() return LingkanUI.db.profile.interface.targetAbsolute.anchorTo end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetAbsolute.anchorTo = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                offsetX = {
+                                                    name = "Offset X",
+                                                    desc = "Horizontal offset from the anchor point",
+                                                    type = "range",
+                                                    min = -200,
+                                                    max = 200,
+                                                    step = 1,
+                                                    order = 5,
+                                                    get = function() return LingkanUI.db.profile.interface.targetAbsolute.offsetX end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetAbsolute.offsetX = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                offsetY = {
+                                                    name = "Offset Y",
+                                                    desc = "Vertical offset from the anchor point",
+                                                    type = "range",
+                                                    min = -200,
+                                                    max = 200,
+                                                    step = 1,
+                                                    order = 6,
+                                                    get = function() return LingkanUI.db.profile.interface.targetAbsolute.offsetY end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetAbsolute.offsetY = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                            },
+                                        },
+                                        lifePercent = {
+                                            name = "Leben Prozent",
+                                            type = "group",
+                                            order = 2,
+                                            inline = true,
+                                            args = {
+                                                enabled = {
+                                                    name = "Enable",
+                                                    desc = "Show target health percentage anchored to the right side of the target health bar",
+                                                    type = "toggle",
+                                                    order = 1,
+                                                    get = function() return LingkanUI.db.profile.interface.targetPercent.enabled end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetPercent.enabled = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                font = {
+                                                    name = "Font",
+                                                    desc = "Choose a font for the target percent text",
+                                                    type = "select",
+                                                    dialogControl = "LSM30_Font",
+                                                    values = function()
+                                                        local ok, LSM = pcall(function() return LibStub("LibSharedMedia-3.0") end)
+                                                        if not ok or not LSM then return {} end
+                                                        local list = LSM:List(LSM.MediaType and LSM.MediaType.FONT or "font") or {}
+                                                        local out = {}
+                                                        for _, name in ipairs(list) do out[name] = name end
+                                                        return out
+                                                    end,
+                                                    order = 2,
+                                                    get = function() return LingkanUI.db.profile.interface.targetPercent.font end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetPercent.font = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                outline = {
+                                                    name = "Font Outline",
+                                                    desc = "Outline style for the font",
+                                                    type = "select",
+                                                    values = {
+                                                        NONE = "None",
+                                                        OUTLINE = "Outline",
+                                                        THINOUTLINE = "Thin Outline",
+                                                        MONOCHROME = "Monochrome",
+                                                        MONOCHROMEOUTLINE = "Monochrome Outline",
+                                                    },
+                                                    order = 2.1,
+                                                    get = function() return LingkanUI.db.profile.interface.targetPercent.outline end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetPercent.outline = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                fontsize = {
+                                                    name = "Font Size",
+                                                    desc = "Font size for the target percent text",
+                                                    type = "range",
+                                                    min = 6,
+                                                    max = 36,
+                                                    step = 1,
+                                                    order = 3,
+                                                    get = function() return LingkanUI.db.profile.interface.targetPercent.fontsize end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetPercent.fontsize = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                anchorFrom = {
+                                                    name = "Anchor From",
+                                                    desc = "Anchor point on the text",
+                                                    type = "select",
+                                                    values = { TOPLEFT = "TOPLEFT", TOP = "TOP", TOPRIGHT = "TOPRIGHT", LEFT = "LEFT", CENTER = "CENTER", RIGHT = "RIGHT", BOTTOMLEFT = "BOTTOMLEFT", BOTTOM = "BOTTOM", BOTTOMRIGHT = "BOTTOMRIGHT" },
+                                                    order = 4,
+                                                    get = function() return LingkanUI.db.profile.interface.targetPercent.anchorFrom end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetPercent.anchorFrom = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                anchorTo = {
+                                                    name = "Anchor To",
+                                                    desc = "Anchor point on the health bar",
+                                                    type = "select",
+                                                    values = { TOPLEFT = "TOPLEFT", TOP = "TOP", TOPRIGHT = "TOPRIGHT", LEFT = "LEFT", CENTER = "CENTER", RIGHT = "RIGHT", BOTTOMLEFT = "BOTTOMLEFT", BOTTOM = "BOTTOM", BOTTOMRIGHT = "BOTTOMRIGHT" },
+                                                    order = 4.1,
+                                                    get = function() return LingkanUI.db.profile.interface.targetPercent.anchorTo end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetPercent.anchorTo = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                offsetX = {
+                                                    name = "Offset X",
+                                                    desc = "Horizontal offset from the anchor point",
+                                                    type = "range",
+                                                    min = -200,
+                                                    max = 200,
+                                                    step = 1,
+                                                    order = 5,
+                                                    get = function() return LingkanUI.db.profile.interface.targetPercent.offsetX end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetPercent.offsetX = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                                offsetY = {
+                                                    name = "Offset Y",
+                                                    desc = "Vertical offset from the anchor point",
+                                                    type = "range",
+                                                    min = -200,
+                                                    max = 200,
+                                                    step = 1,
+                                                    order = 6,
+                                                    get = function() return LingkanUI.db.profile.interface.targetPercent.offsetY end,
+                                                    set = function(_, value)
+                                                        LingkanUI.db.profile.interface.targetPercent.offsetY = value
+                                                        LingkanUI.Interface:ApplyInterfaceSettings()
+                                                    end,
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
                 betterCharacterPanel = {
                     name = "Better Character Panel",
