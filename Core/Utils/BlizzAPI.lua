@@ -64,6 +64,26 @@ function API:RequestLoadItemDataByID(itemID)
     end
 end
 
+-- AddOn loading helpers (C_AddOns in modern clients)
+function API:IsAddOnLoaded(addonName)
+    if C_AddOns and C_AddOns.IsAddOnLoaded then
+        return C_AddOns.IsAddOnLoaded(addonName)
+    end
+    return IsAddOnLoaded(addonName)
+end
+
+function API:GetAddOnEnableState(addonName, character)
+    if C_AddOns and C_AddOns.GetAddOnEnableState then
+        return C_AddOns.GetAddOnEnableState(addonName, character)
+    end
+    return GetAddOnEnableState(addonName, character)
+end
+
+function API:IsAddOnEnabled(addonName, character)
+    local characterName = character or LingkanUI.myname
+    return API:GetAddOnEnableState(addonName, characterName) == 2
+end
+
 -- Debug utility through central system
 function API:Debug(msg)
     LingkanUI:DebugPrint(msg, "api")

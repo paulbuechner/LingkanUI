@@ -15,6 +15,10 @@ versionUtil.isClassicEra = false
 versionUtil.isMop = false
 versionUtil.isRemix = false
 
+-- Centralized installer/client flavor mapping
+-- Keys are used by installer packs (Install/Profiles.lua)
+versionUtil.FLAVOR_ORDER = { "Retail", "Mists", "Wrath", "TBC", "ClassicEra" }
+
 -- Remix detection (buff spellID 1213439 present on player)
 local REMIX_SPELL_ID = 1213439
 local function checkRemixStatus()
@@ -40,6 +44,30 @@ function versionUtil:Init()
     -- print(" isClassicEra: " .. tostring(self.isClassicEra))
     -- print(" isMoP: " .. tostring(self.isMop))
     -- print(" isRemix: " .. tostring(self.isRemix))
+end
+
+-- Returns a stable flavor key used by installer packs.
+-- This is safe to call before :Init() (uses interfaceVersion from GetBuildInfo()).
+function versionUtil:GetFlavorKey()
+    local interfaceVersion = self.interfaceVersion or select(4, GetBuildInfo()) or 0
+
+    if interfaceVersion >= 110000 then
+        return "Retail"
+    end
+
+    if interfaceVersion >= 50000 and interfaceVersion < 60000 then
+        return "Mists"
+    end
+
+    if interfaceVersion >= 30000 and interfaceVersion < 40000 then
+        return "Wrath"
+    end
+
+    if interfaceVersion >= 20000 and interfaceVersion < 30000 then
+        return "TBC"
+    end
+
+    return "ClassicEra"
 end
 
 -- Optional convenience: expansion bucket by interface major (approximate)

@@ -28,6 +28,8 @@ end
 -- ------------------------------------------ Main -----------------------------------------
 
 function LingkanUI.OnInitialize()
+    LingkanUI.myname = UnitName("player")
+
     -- Initialize database
     LingkanUI.db = LibStub("AceDB-3.0"):New("LingkanUIDB", LingkanUI.defaults, true)
 
@@ -60,7 +62,10 @@ end
 --------------------------------------- Slash Commands ---------------------------------------
 
 function LingkanUI:SlashCommand(input)
-    if not input or input:trim() == "" then
+    input = input or ""
+    input = input:trim()
+
+    if input == "" then
         -- Open options panel
         if LingkanUI.Version.isRetail then
             -- Retail/Dragonflight and newer
@@ -70,7 +75,21 @@ function LingkanUI:SlashCommand(input)
             LibStub("AceConfigDialog-3.0"):Open("LingkanUI")
         end
     else
-        LingkanUI:Print("Usage: /lingkanui or /lui - Opens the options panel")
+        local cmd = input:match("^(%S+)")
+        cmd = cmd and cmd:lower() or ""
+
+        if cmd == "install" then
+            if LingkanUI.Installer and LingkanUI.Installer.Show then
+                LingkanUI.Installer:Show()
+            else
+                LingkanUI:Print("Installer not loaded")
+            end
+            return
+        end
+
+        LingkanUI:Print("Usage:")
+        LingkanUI:Print("  /lui - Opens the options panel")
+        LingkanUI:Print("  /lui install - Opens the installer")
     end
 end
 
