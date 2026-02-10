@@ -18,13 +18,11 @@ local function ResolveFontPath(fontKey)
         fontPath = "Fonts\\FRIZQT__.TTF"
     end
 
-    local ok, LSM = pcall(function()
-        return LibStub and LibStub("LibSharedMedia-3.0", true)
-    end)
-    if ok and LSM and fontPath then
+    local LSM = LibStub("LibSharedMedia-3.0", true)
+    if LSM and fontPath then
         local mediaKey = (LSM.MediaType and LSM.MediaType.FONT) or "font"
         local fetched = LSM:Fetch(mediaKey, fontPath)
-        if fetched and type(fetched) == "string" then
+        if fetched then
             fontPath = fetched
         end
     end
@@ -50,7 +48,7 @@ local function ApplyFontStringStyle(fs, cfg, anchorTarget)
     local fontPath = ResolveFontPath(cfg.font)
     local fontSize = cfg.fontsize or 12
     local outlineFlag = (cfg.outline and cfg.outline ~= "NONE") and cfg.outline or nil
-    pcall(function() fs:SetFont(fontPath, fontSize, outlineFlag) end)
+    fs:SetFont(fontPath, fontSize, outlineFlag)
 
     fs:SetTextColor(1, 1, 1)
     fs:ClearAllPoints()
@@ -66,6 +64,63 @@ local function SafeSetFormattedText(fs, fmt, ...)
     local args = { ... }
     local unpackFn = unpack or (table and table.unpack)
     return pcall(function() fs:SetFormattedText(fmt, unpackFn(args)) end)
+end
+
+local function Lerp(a, b, t)
+    return a + (b - a) * t
+end
+
+local function SetTargetTextColor(frame, r, g, b)
+    if not (frame and frame.fs) then return end
+    frame._tr, frame._tg, frame._tb = r, g, b
+    if not frame._colorInit then
+        frame._colorInit = true
+        frame.fs:SetTextColor(r, g, b)
+    end
+end
+
+local function AnimateTargetTextColor(frame, elapsed)
+    if not (frame and frame.fs and frame._tr) then return end
+    if not frame.fs:IsShown() then return end
+
+    local cr, cg, cb = frame.fs:GetTextColor()
+    local duration = 0.15
+    local t = (elapsed or 0) / duration
+    if t > 1 then t = 1 end
+
+    local nr = Lerp(cr, frame._tr, t)
+    local ng = Lerp(cg, frame._tg, t)
+    local nb = Lerp(cb, frame._tb, t)
+    frame.fs:SetTextColor(nr, ng, nb)
+end
+
+-- Range helpers (best-effort; some APIs only work for friendly units)
+local OUT_OF_RANGE_YARDS = 25
+local RangeCheck = LibStub("LibRangeCheck-3.0")
+
+local function IsUnitOutOfRange(unit)
+    if not unit or not UnitExists(unit) then return false end
+
+    -- Primary: LibRangeCheck-3.0 (works for both friend/enemy via spell/item/interact checks)
+    if RangeCheck and RangeCheck.GetRange then
+        local minRange, maxRange = RangeCheck:GetRange(unit)
+        -- If we can estimate a minimum range beyond our threshold, it's definitely out of range.
+        if minRange and minRange > OUT_OF_RANGE_YARDS then
+            return true
+        end
+        -- Otherwise (unknown/overlapping range buckets), don't grey out.
+        return false
+    end
+
+    -- Fallback: native friendly-unit range API when it provides a checked value.
+    if UnitInRange then
+        local inRange, checked = UnitInRange(unit)
+        if checked ~= nil then
+            return not inRange
+        end
+    end
+
+    return false
 end
 
 local function UpdateIndicatorText(interfaceModule, frameKey, cfgKey, unit, isPercent)
@@ -90,6 +145,17 @@ local function UpdateIndicatorText(interfaceModule, frameKey, cfgKey, unit, isPe
     end
 
     fs:Show()
+
+    -- Grey out target indicators when target is out of range (best-effort).
+    if unit == "target" and IsUnitOutOfRange("target") then
+        SetTargetTextColor(frame, 0.6, 0.6, 0.6)
+    else
+        if unit == "target" then
+            SetTargetTextColor(frame, 1, 1, 1)
+        else
+            fs:SetTextColor(1, 1, 1)
+        end
+    end
 
     local val
     if isPercent then
@@ -127,6 +193,19 @@ local function EnsureIndicatorFrame(interfaceModule, frameKey, cfgKey, unit, isP
     end
     frame:RegisterUnitEvent("UNIT_HEALTH", unit)
     frame:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
+
+    -- Target range changes do not reliably trigger events; poll lightly.
+    if unit == "target" then
+        frame._rangeElapsed = 0
+        frame:SetScript("OnUpdate", function(self, elapsed)
+            AnimateTargetTextColor(self, elapsed)
+            self._rangeElapsed = (self._rangeElapsed or 0) + (elapsed or 0)
+            if self._rangeElapsed >= 0.1 then
+                self._rangeElapsed = 0
+                UpdateIndicatorText(interfaceModule, frameKey, cfgKey, unit, isPercent)
+            end
+        end)
+    end
 
     interfaceModule[frameKey] = frame
 end
