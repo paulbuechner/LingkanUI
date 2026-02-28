@@ -34,3 +34,4 @@ LSM:Register(MediaType_FONT, "GothamNarrow-Ultra", [[Interface\Addons\LingkanUI\
 -- -----
 LSM:Register(MediaType_STATUSBAR, "Lingkan Mouseover", [[Interface\Addons\LingkanUI\Core\Media\Textures\Lingkan_overlay_mouseover_1]])
 LSM:Register(MediaType_STATUSBAR, "Lingkan Target", [[Interface\Addons\LingkanUI\Core\Media\Textures\Lingkan_overlay_target_1]])
+LSM:Register(MediaType_STATUSBAR, "Lingkan Details", [[Interface\Addons\LingkanUI\Core\Media\Textures\LingkanDetails]])
