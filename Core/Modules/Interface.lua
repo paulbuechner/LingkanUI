@@ -31,14 +31,17 @@ local function ResolveFontPath(fontKey)
 end
 
 local function GetPlayerHealthbar()
-    return ElvUF_Player_Healthbar
-        or _G["ElvUF_Player_Healthbar"]
+    -- Prefer the oUF element reference; the named global (ElvUF_Player_HealthBar) is an implementation detail of ElvUI
+    local elv = _G["ElvUF_Player"]
+    return (elv and elv.Health)
+        or _G["ElvUF_Player_HealthBar"]
         or (_G["PlayerFrame"] and _G["PlayerFrame"].healthbar)
 end
 
 local function GetTargetHealthbar()
-    return ElvUF_Target_Healthbar
-        or _G["ElvUF_Target_Healthbar"]
+    local elv = _G["ElvUF_Target"]
+    return (elv and elv.Health)
+        or _G["ElvUF_Target_HealthBar"]
         or (_G["TargetFrame"] and _G["TargetFrame"].healthbar)
 end
 
