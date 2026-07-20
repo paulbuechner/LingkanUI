@@ -130,6 +130,9 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
     -- LingkanUI.Customizing.LoadBartender4() -- Currently handled via "Gryphons and Wyverns" WA -> Actions -> On Init
 
     -- ElvUI
+
+    -- AddOnSkins
+    LingkanUI.Customizing.LoadAddOnSkins()
 end
 
 function LingkanUI:FIRST_FRAME_RENDERED()

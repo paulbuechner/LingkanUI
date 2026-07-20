@@ -81,3 +81,4 @@ Core\Media\Load_Media.xml
 ## Addon Customizing ##
 Customizing\Bartender4.lua
 Customizing\ElvUI.lua
+Customizing\AddOnSkins.lua
