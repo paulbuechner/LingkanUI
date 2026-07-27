@@ -1,69 +1,79 @@
 ## Interface: 11507, 50500, 120000, 120001
 
-## Title: LingkanUI
+## Title: |cff0091edLingkan|r|cffffa300UI|r
+## Notes: Personal UI suite and quality of life tweaks
+## Version: 20260728
+## Author: Paul Büchner
 
-## OptionalDeps: ElvUI, Bartender4, Ace3, Masque, NaowhUI, DevTool, LibButtonGlow-1.0, LibActionButton-1.0, LibKeyBound-1.0, LibDBIcon-1.0, LibWindow-1.1, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibDualSpec-1.0
+## IconTexture: Interface\AddOns\LingkanUI\Core\Media\Textures\LogoAddon
+## AddonCompartmentFunc: LingkanUI_OnAddonCompartmentClick
+## Category: User Interface
+## X-Category: User Interface
+
+## OptionalDeps: ElvUI, Bartender4, AddOnSkins, Masque, NaowhUI, DevTool, LibSharedMedia-3.0
 
 ## SavedVariables: LingkanUIDB
 
+## Libraries ##
 #@no-lib-strip@
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Libs\AceDB-3.0\AceDB-3.0.xml
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 Libs\LibRangeCheck-3.0\LibRangeCheck-3.0.lua
 #@end-no-lib-strip@
 
-# Libs\LibDataBroker-1.1.lua
+## Core ##
+# Colors define the branding used by Core's chat prefix, so they load first
+Data\Colors.lua
+Core.lua
 
-#@no-lib-strip@
-Libs\AceAddon-3.0\AceAddon-3.0.xml
-Libs\AceEvent-3.0\AceEvent-3.0.xml
-# Libs\AceTimer-3.0\AceTimer-3.0.xml
-# Libs\AceBucket-3.0\AceBucket-3.0.xml
-Libs\AceHook-3.0\AceHook-3.0.xml
-Libs\AceDB-3.0\AceDB-3.0.xml
-Libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
-Libs\AceLocale-3.0\AceLocale-3.0.xml
-Libs\AceConsole-3.0\AceConsole-3.0.xml
-Libs\AceGUI-3.0\AceGUI-3.0.xml
-Libs\AceConfig-3.0\AceConfig-3.0.xml
-# Libs\AceComm-3.0\AceComm-3.0.xml
-# Libs\AceTab-3.0\AceTab-3.0.xml
-# Libs\AceSerializer-3.0\AceSerializer-3.0.xml
+Data\Version.lua
+Data\BlizzAPI.lua
 
-# Libs\LibKeyBound-1.0\lib.xml
-# Libs\LibButtonGlow-1.0\LibButtonGlow-1.0.lua
-# Libs\LibActionButton-1.0\LibActionButton-1.0.lua
-# Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
-# Libs\LibWindow-1.1\LibWindow-1.1.lua
-# Libs\LibDualSpec-1.0\LibDualSpec-1.0.lua
+## Locales ##
+# Locale tables must exist before Localization runs UpdateLanguage()
+Locales\enUS.lua
+Locales\deDE.lua
+Core\Localization.lua
 
-# Libs\LibSharedMedia-3.0\lib.xml
-# Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
-#@end-no-lib-strip@
-
-# Locales #
-Locale/enUS.lua
-Locale/deDE.lua
-Locale/Lang.lua
+## Data ##
+Data\FontList.lua
+Data\Widgets.lua
+Data\SettingsIO.lua
 
 ## Patches ##
 # Patches\ForceLoadTradeSkillData.lua
 Patches\NaowhUITokenBypass.lua
 
-## Core ##
-Core\Utils\Version.lua
-Core\Utils\BlizzAPI.lua
+## Modules ##
+Modules\Interface.lua
+Modules\BetterCharacterPanel.lua
+Modules\RoleIcons.lua
+Modules\Leaning.lua
+Modules\Sheathing.lua
+Modules\TabTargetArenaFix.lua
+Modules\MinimapButton.lua
 
-Core\Modules\BetterCharacterPanel.lua
-Core\Modules\Interface.lua
-Core\Modules\RoleIcons.lua
-Core\Modules\Leaning.lua
-Core\Modules\Sheathing.lua
-Core\Modules\TabTargetArenaFix.lua
+## Configuration UI ##
+UI\MainFrame.lua
+UI\Sidebar.lua
 
-Core\Options\Options.lua
+Config\Home.lua
+Config\General.lua
+Config\Interface.lua
+Config\CharacterPanel.lua
+Config\RoleIcons.lua
+Config\Sheathing.lua
+Config\Leaning.lua
+Config\TabTarget.lua
+Config\Profiles.lua
+Config\Installer.lua
 
-LingkanUI.lua
+## Lifecycle ##
+# Registers PLAYER_ENTERING_WORLD, so it loads once every module exists
+Core\Init.lua
 
 ## Installer ##
 Install\Game\Shared\!load.xml
@@ -75,7 +85,8 @@ Install\Game\Standard\Modules\Installer\Installer.lua
 Install\Game\Mists\Modules\Installer\Installer.lua
 Install\Game\TBC\Modules\Installer\Installer.lua
 Install\Game\Vanilla\Modules\Installer\Installer.lua
-##
+
+## Media ##
 Core\Media\Load_Media.xml
 
 ## Addon Customizing ##
