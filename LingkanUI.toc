@@ -51,6 +51,7 @@ Patches\NaowhUITokenBypass.lua
 Modules\Interface.lua
 Modules\BetterCharacterPanel.lua
 Modules\RoleIcons.lua
+Modules\ZoneText.lua
 Modules\Leaning.lua
 Modules\Sheathing.lua
 Modules\TabTargetArenaFix.lua
@@ -65,6 +66,7 @@ Config\General.lua
 Config\Interface.lua
 Config\CharacterPanel.lua
 Config\RoleIcons.lua
+Config\ZoneText.lua
 Config\Sheathing.lua
 Config\Leaning.lua
 Config\TabTarget.lua

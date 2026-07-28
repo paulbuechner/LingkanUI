@@ -250,6 +250,7 @@ CreateGroup("interface", "INTERFACE", {
     { key = "unit_indicators", label = "Unit Indicators", onClick = Page("InitUnitIndicators") },
     { key = "character_panel", label = "Character Panel", onClick = Page("InitCharacterPanel") },
     { key = "role_icons",      label = "Role Icons",      onClick = Page("InitRoleIcons") },
+    { key = "zone_text",       label = "Zone Text",       onClick = Page("InitZoneText") },
 })
 
 CreateGroup("utility", "UTILITY", {

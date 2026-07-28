@@ -12,6 +12,7 @@ LingkanUI.MODULE_REGISTRY = {
     { db = "interface",            tab = "unit_indicators", name = "Unit Indicators" },
     { db = "betterCharacterPanel", tab = "character_panel", name = "Character Panel" },
     { db = "roleIcons",            tab = "role_icons",      name = "Role Icons" },
+    { db = "zoneText",             tab = "zone_text",       name = "Zone Text" },
     { db = "sheath",               tab = "sheathing",       name = "Sheathing" },
     { db = "lean",                 tab = "leaning",         name = "Leaning" },
     { db = "tabTargetArenaFix",    tab = "tab_target",      name = "Tab Target Arena Fix" },
@@ -25,6 +26,7 @@ LingkanUI.MODULE_KEYWORDS = {
     interface            = { "health", "percent", "indicator", "player", "target", "font", "offset" },
     betterCharacterPanel = { "item level", "ilvl", "enchant", "socket", "gem", "durability", "scale" },
     roleIcons            = { "role", "tank", "healer", "damage", "raid", "chat", "class icon" },
+    zoneText             = { "zone", "subzone", "area", "font size", "announcement", "text size" },
     sheath               = { "weapon", "sheath", "unsheath", "melee", "ranged" },
     lean                 = { "lean", "emote", "idle" },
     tabTargetArenaFix    = { "tab", "target", "arena", "pvp", "keybind" },
@@ -81,6 +83,9 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
 
     -- Panel scale is a plain display preference, so it applies even with the module off
     LingkanUI.BetterCharacterPanel:ApplyScale()
+
+    -- Always loads: it hooks ElvUI's font pass and no-ops until the override is enabled
+    LingkanUI.ZoneText:Load()
 
     -- RETAIL ONLY
     if LingkanUI.Version.isRetail then

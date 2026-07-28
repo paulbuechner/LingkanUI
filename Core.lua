@@ -109,6 +109,12 @@ LingkanUI.defaults = {
                 debug = false,
             },
         },
+        zoneText = {
+            enabled = false,
+            zoneSize = 32,
+            subZoneSize = 25,
+            debug = false,
+        },
         minimap = {
             hide = false,
             minimapPos = 220,

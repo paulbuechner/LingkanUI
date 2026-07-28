@@ -55,6 +55,7 @@ function LingkanUI:InitGeneral()
                     profile.lean.debug = false
                     profile.tabTargetArenaFix.debug = false
                     profile.betterCharacterPanel.debug = false
+                    profile.zoneText.debug = false
                     if profile.roleIcons then
                         profile.roleIcons.debug = false
                     end
@@ -75,6 +76,7 @@ function LingkanUI:InitGeneral()
             { label = "Leaning",             db = LingkanUI.db.profile.lean,                 key = "debug" },
             { label = "Tab Target Arena Fix", db = LingkanUI.db.profile.tabTargetArenaFix,   key = "debug" },
             { label = "Role Icons",          db = LingkanUI.db.profile.roleIcons,            key = "debug" },
+            { label = "Zone Text",           db = LingkanUI.db.profile.zoneText,             key = "debug" },
             { label = "Character Panel",     db = LingkanUI.db.profile.betterCharacterPanel, key = "debug" },
         }
 

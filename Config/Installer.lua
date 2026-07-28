@@ -111,6 +111,7 @@ function LingkanUI:InitAbout()
             end },
             { name = "Character Panel", check = function() return LingkanUI.db.profile.betterCharacterPanel.enabled end },
             { name = "Role Icons",      check = function() return LingkanUI.db.profile.roleIcons.enabled end },
+            { name = "Zone Text",       check = function() return LingkanUI.db.profile.zoneText.enabled end },
             { name = "Sheathing",       check = function() return LingkanUI.db.profile.sheath.enabled end },
             { name = "Leaning",         check = function() return LingkanUI.db.profile.lean.enabled end },
             { name = "Tab Target Fix",  check = function() return LingkanUI.db.profile.tabTargetArenaFix.enabled end },
