@@ -16,6 +16,7 @@ LingkanUI.MODULE_REGISTRY = {
     { db = "sheath",               tab = "sheathing",       name = "Sheathing" },
     { db = "lean",                 tab = "leaning",         name = "Leaning" },
     { db = "tabTargetArenaFix",    tab = "tab_target",      name = "Tab Target Arena Fix" },
+    { db = "naowhUI",              tab = "addon_tweaks",    name = "Addon Tweaks" },
     { db = "profiles",             tab = "profiles",        name = "Profiles" },
     { db = "installer",            tab = "installer",       name = "Installer" },
 }
@@ -30,6 +31,8 @@ LingkanUI.MODULE_KEYWORDS = {
     sheath               = { "weapon", "sheath", "unsheath", "melee", "ranged" },
     lean                 = { "lean", "emote", "idle" },
     tabTargetArenaFix    = { "tab", "target", "arena", "pvp", "keybind" },
+    naowhUI              = { "damage meter", "details", "opacity", "background", "naowh",
+                             "ellesmere", "dark mode", "transparency" },
     profiles             = { "import", "export", "profile", "share", "backup" },
     installer            = { "install", "setup", "elvui", "profile setup" },
 }
@@ -108,6 +111,9 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
 
     -- AddOnSkins
     LingkanUI.Customizing.LoadAddOnSkins()
+
+    -- NaowhUI (damage meter background opacity)
+    LingkanUI.Customizing.LoadNaowhUI()
 end
 
 function LingkanUI:FIRST_FRAME_RENDERED()

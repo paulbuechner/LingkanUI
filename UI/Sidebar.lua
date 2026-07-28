@@ -257,6 +257,7 @@ CreateGroup("utility", "UTILITY", {
     { key = "sheathing",  label = "Sheathing",            onClick = Page("InitSheathing") },
     { key = "leaning",    label = "Leaning",              onClick = Page("InitLeaning") },
     { key = "tab_target", label = "Tab Target Arena Fix", onClick = Page("InitTabTarget") },
+    { key = "addon_tweaks", label = "Addon Tweaks",       onClick = Page("InitAddonTweaks") },
 })
 
 CreateGroup("system", "SYSTEM", {

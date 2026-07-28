@@ -70,6 +70,7 @@ Config\ZoneText.lua
 Config\Sheathing.lua
 Config\Leaning.lua
 Config\TabTarget.lua
+Config\AddonTweaks.lua
 Config\Profiles.lua
 Config\Installer.lua
 
@@ -95,3 +96,4 @@ Core\Media\Load_Media.xml
 Customizing\Bartender4.lua
 Customizing\ElvUI.lua
 Customizing\AddOnSkins.lua
+Customizing\NaowhUI.lua
