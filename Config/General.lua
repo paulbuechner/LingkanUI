@@ -56,7 +56,8 @@ function LingkanUI:InitGeneral()
                     profile.tabTargetArenaFix.debug = false
                     profile.betterCharacterPanel.debug = false
                     profile.zoneText.debug = false
-                    profile.naowhUI.debug = false
+                    profile.chatBubbles.debug = false
+                    profile.euiMerge.debug = false
                     if profile.roleIcons then
                         profile.roleIcons.debug = false
                     end
@@ -78,8 +79,9 @@ function LingkanUI:InitGeneral()
             { label = "Tab Target Arena Fix", db = LingkanUI.db.profile.tabTargetArenaFix,   key = "debug" },
             { label = "Role Icons",          db = LingkanUI.db.profile.roleIcons,            key = "debug" },
             { label = "Zone Text",           db = LingkanUI.db.profile.zoneText,             key = "debug" },
-            { label = "Addon Tweaks",        db = LingkanUI.db.profile.naowhUI,              key = "debug" },
+            { label = "Chat Bubbles",        db = LingkanUI.db.profile.chatBubbles,          key = "debug" },
             { label = "Character Panel",     db = LingkanUI.db.profile.betterCharacterPanel, key = "debug" },
+            { label = "Profile Merge",       db = LingkanUI.db.profile.euiMerge,             key = "debug" },
         }
 
         for index, toggle in ipairs(debugToggles) do

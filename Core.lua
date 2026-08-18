@@ -109,19 +109,34 @@ LingkanUI.defaults = {
                 debug = false,
             },
         },
-        naowhUI = {
-            -- Re-asserts the EllesmereUI damage meter background opacity that
-            -- NaowhUI's dark mode forces to zero on every login
-            damageMeterBg = {
-                enabled = false,
-                alpha = 0.65,
-            },
-            debug = false,
-        },
         zoneText = {
             enabled = false,
             zoneSize = 32,
             subZoneSize = 25,
+            debug = false,
+        },
+        chatBubbles = {
+            enabled = false,
+            fontSize = 12,
+            senderFontSize = 12,
+            debug = false,
+        },
+        euiMerge = {
+            -- Interactive merge between two EllesmereUI profiles.
+            -- See Modules/EUIProfileMerge.lua
+            sourceProfile = "Naowh",
+            targetProfile = "LUI",
+            destinationProfile = "LUI Merged",
+            -- Write straight into targetProfile instead of a separate one
+            mergeInPlace = false,
+            -- Remembered per-setting choices, keyed by path, so a re-run of the same
+            -- merge does not have to be reviewed from scratch
+            selected = {},
+            -- Settings pinned as "keep mine": never selectable, never merged
+            locked = {},
+            -- Frame positions drift by fractions of a pixel between profiles; without
+            -- this the diff is mostly noise
+            ignoreTinyNumbers = true,
             debug = false,
         },
         minimap = {
@@ -277,15 +292,6 @@ function LingkanUI:SlashCommand(input)
         return
     end
 
-    if cmd == "dmdebug" then
-        if LingkanUI.Customizing and LingkanUI.Customizing.DebugDamageMeter then
-            LingkanUI.Customizing:DebugDamageMeter()
-        else
-            LingkanUI:Print("Damage meter diagnostics not loaded")
-        end
-        return
-    end
-
     if cmd == "config" or cmd == "options" then
         if LingkanUI.ToggleConfig then
             LingkanUI:ToggleConfig()
@@ -296,7 +302,6 @@ function LingkanUI:SlashCommand(input)
     LingkanUI:Print("Usage:")
     LingkanUI:Print("  /lui - Opens the configuration window")
     LingkanUI:Print("  /lui install - Opens the installer")
-    LingkanUI:Print("  /lui dmdebug - Reports the damage meter background layers")
 end
 
 SLASH_LINGKANUI1 = "/lui"

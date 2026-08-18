@@ -820,6 +820,162 @@ function Widgets:CreateTextInput(parent, opts)
     return Register(container)
 end
 
+-- Editable dropdown: type a value, or pick an existing one from the arrow.
+-- `values` follows the same shape as CreateDropdown.
+function Widgets:CreateComboBox(parent, opts)
+    local width = opts.width or 200
+
+    local container = CreateFrame("Frame", nil, parent)
+    container:SetPoint("TOPLEFT", opts.x or 10, opts.y or 0)
+    container:SetSize(width, 44)
+
+    local label = container:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    label:SetPoint("TOPLEFT")
+    label:SetText(opts.label or "")
+
+    local editBox = CreateFrame("EditBox", nil, container, "BackdropTemplate")
+    editBox:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -6)
+    editBox:SetSize(width, 22)
+    editBox:SetAutoFocus(false)
+    editBox:SetFontObject("GameFontHighlightSmall")
+    editBox:SetTextInsets(6, 22, 0, 0)
+    editBox:SetMaxLetters(opts.maxLetters or 64)
+    ApplyBackdrop(editBox,
+        { r = C.BG_PANEL.r, g = C.BG_PANEL.g, b = C.BG_PANEL.b, a = 0.95 },
+        { r = C.DARK_BLUE.r, g = C.DARK_BLUE.g, b = C.DARK_BLUE.b, a = 0.7 })
+
+    local arrow = CreateFrame("Button", nil, editBox)
+    arrow:SetSize(18, 20)
+    arrow:SetPoint("RIGHT", -1, 0)
+
+    local arrowText = arrow:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    arrowText:SetPoint("CENTER")
+    arrowText:SetText("v")
+    arrowText:SetTextColor(C.ORANGE.r, C.ORANGE.g, C.ORANGE.b)
+
+    local list = CreateFrame("Frame", nil, editBox, "BackdropTemplate")
+    list:SetPoint("TOPLEFT", editBox, "BOTTOMLEFT", 0, -2)
+    list:SetWidth(width)
+    list:SetFrameStrata("DIALOG")
+    list:SetFrameLevel(editBox:GetFrameLevel() + 20)
+    ApplyBackdrop(list,
+        { r = C.BG_PANEL.r, g = C.BG_PANEL.g, b = C.BG_PANEL.b, a = 0.98 },
+        { r = C.BLUE.r, g = C.BLUE.g, b = C.BLUE.b, a = 0.7 })
+    list:Hide()
+
+    local entryButtons = {}
+
+    local function Commit(value)
+        WriteValue(opts, value)
+    end
+
+    local function CloseList() list:Hide() end
+
+    local function OpenList()
+        local values = opts.values
+        if type(values) == "function" then values = values() end
+        values = values or {}
+
+        local shown = 0
+        for index, entry in ipairs(values) do
+            local button = entryButtons[index]
+            if not button then
+                button = CreateFrame("Button", nil, list, "BackdropTemplate")
+                button:SetSize(width - 2, 20)
+                button:SetPoint("TOPLEFT", 1, -((index - 1) * 20) - 1)
+                button:SetBackdrop({ bgFile = WHITE8X8 })
+                button:SetBackdropColor(0, 0, 0, 0)
+
+                local text = button:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+                text:SetPoint("LEFT", 8, 0)
+                text:SetPoint("RIGHT", -8, 0)
+                text:SetJustifyH("LEFT")
+                button.text = text
+
+                button:SetScript("OnEnter", function(self)
+                    self:SetBackdropColor(C.ORANGE.r, C.ORANGE.g, C.ORANGE.b, 0.25)
+                end)
+                button:SetScript("OnLeave", function(self)
+                    self:SetBackdropColor(0, 0, 0, 0)
+                end)
+                entryButtons[index] = button
+            end
+
+            button.text:SetText(entry.text)
+            button:SetScript("OnClick", function()
+                CloseList()
+                editBox:SetText(tostring(entry.value))
+                editBox:ClearFocus()
+                Commit(entry.value)
+            end)
+            button:Show()
+            shown = index
+        end
+
+        for index = shown + 1, #entryButtons do entryButtons[index]:Hide() end
+        if shown == 0 then CloseList() return end
+
+        list:SetHeight(math.min(shown, opts.maxVisible or 12) * 20 + 2)
+        list:Show()
+    end
+
+    arrow:SetScript("OnClick", function()
+        if IsDisabled(opts) then return end
+        if list:IsShown() then CloseList() else OpenList() end
+    end)
+
+    editBox:SetScript("OnEnterPressed", function(self)
+        CloseList()
+        Commit(self:GetText())
+        self:ClearFocus()
+    end)
+    editBox:SetScript("OnEditFocusLost", function(self)
+        Commit(self:GetText())
+    end)
+    editBox:SetScript("OnEscapePressed", function(self)
+        CloseList()
+        self:ClearFocus()
+        Widgets:RefreshAll()
+    end)
+
+    list:SetScript("OnUpdate", function(self)
+        if not self:IsMouseOver(10, -10, -10, 10) and not editBox:IsMouseOver() then
+            if not self.hoverGrace then
+                self.hoverGrace = GetTime() + 0.4
+            elseif GetTime() > self.hoverGrace then
+                self.hoverGrace = nil
+                CloseList()
+            end
+        else
+            self.hoverGrace = nil
+        end
+    end)
+
+    AttachTooltip(editBox, opts.label, opts.desc)
+
+    function container:LUIRefresh()
+        if not editBox:HasFocus() then
+            editBox:SetText(tostring(ReadValue(opts) or ""))
+        end
+
+        local disabled = IsDisabled(opts)
+        editBox:SetEnabled(not disabled)
+        arrow:EnableMouse(not disabled)
+        if disabled then
+            CloseList()
+            label:SetTextColor(C.DIM.r, C.DIM.g, C.DIM.b)
+            arrowText:SetTextColor(C.DIM.r, C.DIM.g, C.DIM.b)
+        else
+            label:SetTextColor(C.WHITE.r, C.WHITE.g, C.WHITE.b)
+            arrowText:SetTextColor(C.ORANGE.r, C.ORANGE.g, C.ORANGE.b)
+        end
+    end
+
+    container.editBox = editBox
+    container:LUIRefresh()
+    return Register(container)
+end
+
 -- Scrollable multi-line box, used for profile import/export strings
 function Widgets:CreateMultiLineInput(parent, opts)
     local container = CreateFrame("Frame", nil, parent)

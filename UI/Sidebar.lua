@@ -251,17 +251,18 @@ CreateGroup("interface", "INTERFACE", {
     { key = "character_panel", label = "Character Panel", onClick = Page("InitCharacterPanel") },
     { key = "role_icons",      label = "Role Icons",      onClick = Page("InitRoleIcons") },
     { key = "zone_text",       label = "Zone Text",       onClick = Page("InitZoneText") },
+    { key = "chat_bubbles",    label = "Chat Bubbles",    onClick = Page("InitChatBubbles") },
 })
 
 CreateGroup("utility", "UTILITY", {
     { key = "sheathing",  label = "Sheathing",            onClick = Page("InitSheathing") },
     { key = "leaning",    label = "Leaning",              onClick = Page("InitLeaning") },
     { key = "tab_target", label = "Tab Target Arena Fix", onClick = Page("InitTabTarget") },
-    { key = "addon_tweaks", label = "Addon Tweaks",       onClick = Page("InitAddonTweaks") },
 })
 
 CreateGroup("system", "SYSTEM", {
-    { key = "profiles",  label = "Profiles",  onClick = Page("InitProfiles") },
+    { key = "profiles",    label = "Profiles",        onClick = Page("InitProfiles") },
+    { key = "eui_merge",   label = "Profile Merge",   onClick = Page("InitEUIProfileMerge") },
     { key = "installer", label = "Installer", onClick = Page("InitInstaller") },
     { key = "about",     label = "About",     onClick = Page("InitAbout") },
 })

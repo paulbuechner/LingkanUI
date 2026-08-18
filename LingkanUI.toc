@@ -52,10 +52,12 @@ Modules\Interface.lua
 Modules\BetterCharacterPanel.lua
 Modules\RoleIcons.lua
 Modules\ZoneText.lua
+Modules\ChatBubbles.lua
 Modules\Leaning.lua
 Modules\Sheathing.lua
 Modules\TabTargetArenaFix.lua
 Modules\MinimapButton.lua
+Modules\EUIProfileMerge.lua
 
 ## Configuration UI ##
 UI\MainFrame.lua
@@ -67,11 +69,12 @@ Config\Interface.lua
 Config\CharacterPanel.lua
 Config\RoleIcons.lua
 Config\ZoneText.lua
+Config\ChatBubbles.lua
 Config\Sheathing.lua
 Config\Leaning.lua
 Config\TabTarget.lua
-Config\AddonTweaks.lua
 Config\Profiles.lua
+Config\EUIProfileMerge.lua
 Config\Installer.lua
 
 ## Lifecycle ##
@@ -96,4 +99,3 @@ Core\Media\Load_Media.xml
 Customizing\Bartender4.lua
 Customizing\ElvUI.lua
 Customizing\AddOnSkins.lua
-Customizing\NaowhUI.lua

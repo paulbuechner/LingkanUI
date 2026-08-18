@@ -13,11 +13,12 @@ LingkanUI.MODULE_REGISTRY = {
     { db = "betterCharacterPanel", tab = "character_panel", name = "Character Panel" },
     { db = "roleIcons",            tab = "role_icons",      name = "Role Icons" },
     { db = "zoneText",             tab = "zone_text",       name = "Zone Text" },
+    { db = "chatBubbles",          tab = "chat_bubbles",    name = "Chat Bubbles" },
     { db = "sheath",               tab = "sheathing",       name = "Sheathing" },
     { db = "lean",                 tab = "leaning",         name = "Leaning" },
     { db = "tabTargetArenaFix",    tab = "tab_target",      name = "Tab Target Arena Fix" },
-    { db = "naowhUI",              tab = "addon_tweaks",    name = "Addon Tweaks" },
     { db = "profiles",             tab = "profiles",        name = "Profiles" },
+    { db = "euiMerge",             tab = "eui_merge",       name = "Profile Merge" },
     { db = "installer",            tab = "installer",       name = "Installer" },
 }
 
@@ -28,12 +29,13 @@ LingkanUI.MODULE_KEYWORDS = {
     betterCharacterPanel = { "item level", "ilvl", "enchant", "socket", "gem", "durability", "scale" },
     roleIcons            = { "role", "tank", "healer", "damage", "raid", "chat", "class icon" },
     zoneText             = { "zone", "subzone", "area", "font size", "announcement", "text size" },
+    chatBubbles          = { "bubble", "speech", "chat bubble", "font size", "nbubble", "say" },
     sheath               = { "weapon", "sheath", "unsheath", "melee", "ranged" },
     lean                 = { "lean", "emote", "idle" },
     tabTargetArenaFix    = { "tab", "target", "arena", "pvp", "keybind" },
-    naowhUI              = { "damage meter", "details", "opacity", "background", "naowh",
-                             "ellesmere", "dark mode", "transparency" },
     profiles             = { "import", "export", "profile", "share", "backup" },
+    euiMerge             = { "ellesmere", "eui", "naowh", "merge", "diff", "profile",
+                             "customisation", "customization", "update", "compare" },
     installer            = { "install", "setup", "elvui", "profile setup" },
 }
 
@@ -87,8 +89,9 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
     -- Panel scale is a plain display preference, so it applies even with the module off
     LingkanUI.BetterCharacterPanel:ApplyScale()
 
-    -- Always loads: it hooks ElvUI's font pass and no-ops until the override is enabled
+    -- Both hook ElvUI's font pass, so they load regardless and no-op until enabled
     LingkanUI.ZoneText:Load()
+    LingkanUI.ChatBubbles:Load()
 
     -- RETAIL ONLY
     if LingkanUI.Version.isRetail then
@@ -111,9 +114,6 @@ function LingkanUI:PLAYER_ENTERING_WORLD()
 
     -- AddOnSkins
     LingkanUI.Customizing.LoadAddOnSkins()
-
-    -- NaowhUI (damage meter background opacity)
-    LingkanUI.Customizing.LoadNaowhUI()
 end
 
 function LingkanUI:FIRST_FRAME_RENDERED()
