@@ -1,4 +1,4 @@
-## Interface: 11507, 50500, 120000, 120001
+## Interface: 11507, 50500, 120100
 
 ## Title: |cff0091edLingkan|r|cffffa300UI|r
 ## Notes: Personal UI suite and quality of life tweaks
