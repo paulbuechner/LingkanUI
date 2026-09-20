@@ -10,7 +10,7 @@
 ## Category: User Interface
 ## X-Category: User Interface
 
-## OptionalDeps: ElvUI, Bartender4, AddOnSkins, Masque, NaowhUI, DevTool, LibSharedMedia-3.0
+## OptionalDeps: ElvUI, Bartender4, AddOnSkins, Masque, NaowhUI, DevTool, LibSharedMedia-3.0, WIM
 
 ## SavedVariables: LingkanUIDB
 
@@ -99,3 +99,13 @@ Core\Media\Load_Media.xml
 Customizing\Bartender4.lua
 Customizing\ElvUI.lua
 Customizing\AddOnSkins.lua
+
+# WIM skin (was the standalone EllesmereSkin_WIM addon). These register with
+# WIM's skin engine at file scope rather than from a Load function, because the
+# skin has to be in WIM's table before WIM resolves the saved selection -- hence
+# WIM in OptionalDeps above, which orders it ahead of us without requiring it.
+Customizing\WIM\Locale.lua
+Customizing\WIM\Theme.lua
+Customizing\WIM\Pixel.lua
+Customizing\WIM\Skin.lua
+Customizing\WIM\Shell.lua
